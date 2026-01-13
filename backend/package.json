@@ -9,6 +9,7 @@
     "elysia": "latest"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.3.11",
     "bun-types": "latest"
   },
   "module": "src/index.js"
