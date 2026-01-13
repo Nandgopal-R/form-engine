@@ -6,7 +6,6 @@ bun.lockb
 
 # env
 .env
-.env.*
 
 # build
 dist/
