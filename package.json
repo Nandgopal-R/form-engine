@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7"
+  },
+  "scripts": {
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "backend/**/*.{ts,js,json}": [
+      "bunx biome check --write",
+      "bunx biome check"
+    ]
+  }
+}
