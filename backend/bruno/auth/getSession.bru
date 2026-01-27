@@ -1,0 +1,16 @@
+meta {
+  name: getSession
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:8000/api/auth/get-session
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

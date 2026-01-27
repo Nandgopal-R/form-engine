@@ -1,7 +1,12 @@
 import { Elysia } from "elysia";
 import { logger } from "./logger/index";
+import { authRoutes } from "./api/auth/routes"
 
-const app = new Elysia().get("/", () => "Hello Elysia").listen(8000);
+const app = new Elysia()
+  .get("/", () => "🦊 Elysia server started")
+  .use(authRoutes);
+
+app.listen(8000);
 
 if (app.server) {
   logger.success("🦊 Elysia server started", {
