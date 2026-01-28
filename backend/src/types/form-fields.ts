@@ -59,3 +59,15 @@ export interface UpdateFieldContext extends Context {
   params: Static<typeof updateFieldDTO.params>;
   body: Static<typeof updateFieldDTO.body>;
 }
+
+export const deleteFieldDTO = {
+  params: t.Object({
+    id: t.String({
+      format: "uuid",
+    }),
+  }),
+};
+
+export interface DeleteFieldContext extends Context {
+  params: Static<typeof deleteFieldDTO.params>;
+}

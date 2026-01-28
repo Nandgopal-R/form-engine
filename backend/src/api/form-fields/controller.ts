@@ -1,6 +1,6 @@
 import { prisma } from "../../db/prisma"
 import { logger } from "../../logger/"
-import { GetAllFieldsContext, CreateFieldContext, UpdateFieldContext } from "../../types/form-fields"
+import { GetAllFieldsContext, CreateFieldContext, UpdateFieldContext, DeleteFieldContext } from "../../types/form-fields"
 
 export async function getAllFields({ params, set }: GetAllFieldsContext) {
   const formExists = await prisma.form.count({
@@ -109,8 +109,8 @@ export async function createField({ params, body, set, user }: CreateFieldContex
       }
 
       return newField
-    }
-
+    } 
+    
     // Fallback: If no prevFieldId is provided, we assume it's the first field 
     // or simply creating a field without links yet.
     return await tx.formFields.create({
@@ -169,3 +169,47 @@ export async function updateField({ params, body, set, user }: UpdateFieldContex
     data: updatedField
   }
 }
+
+export async function deleteField({ params, set, user }: DeleteFieldContext) {
+  const field = await prisma.formFields.findUnique({
+    where: { id: params.id },
+    include: { form: true }
+  })
+
+  if (!field) {
+    set.status = 404
+    return { success: false, message: "Field not found" }
+  }
+
+  if (field.form.ownerId !== user.id) {
+    set.status = 403
+    return { success: false, message: "Unauthorized" }
+  }
+
+  await prisma.$transaction(async (tx) => {
+    // 1. Link Previous to Next
+    if (field.prevFieldId) {
+      await tx.formFields.update({
+        where: { id: field.prevFieldId },
+        data: { nextField: field.nextField }
+      })
+    }
+
+    // 2. Link Next to Previous
+    if (field.nextField) {
+      await tx.formFields.update({
+        where: { id: field.nextField },
+        data: { prevFieldId: field.prevFieldId }
+      })
+    }
+
+    // 3. Delete the field
+    await tx.formFields.delete({
+      where: { id: params.id }
+    })
+  })
+
+  logger.info(`Deleted field ${params.id}`)
+  return { success: true, message: "Field deleted successfully" }
+}
+
