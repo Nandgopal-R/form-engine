@@ -1,4 +1,3 @@
-import { uuid } from "better-auth/*";
 import { t, type Static } from "elysia";
 
 export interface Context {
