@@ -39,3 +39,23 @@ export interface CreateFieldContext extends Context {
   params: Static<typeof createFieldDTO.params>;
   body: Static<typeof createFieldDTO.body>;
 }
+
+export const updateFieldDTO = {
+  params: t.Object({
+    id: t.String({
+      format: "uuid",
+    }),
+  }),
+  body: t.Object({
+    fieldName: t.Optional(t.String()),
+    label: t.Optional(t.String()),
+    fieldValueType: t.Optional(t.String()),
+    fieldType: t.Optional(t.String()),
+    validation: t.Optional(t.Any()),
+  }),
+};
+
+export interface UpdateFieldContext extends Context {
+  params: Static<typeof updateFieldDTO.params>;
+  body: Static<typeof updateFieldDTO.body>;
+}
