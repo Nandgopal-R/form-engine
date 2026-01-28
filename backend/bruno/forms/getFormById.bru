@@ -1,0 +1,20 @@
+meta {
+  name: getFormById
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8000/forms/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 00f09999-1714-4c57-8102-ea6f1ebc427a
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
