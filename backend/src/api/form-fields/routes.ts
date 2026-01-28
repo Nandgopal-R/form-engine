@@ -1,9 +1,10 @@
 import { requireAuth } from "../auth/requireAuth";
-import { getAllFields } from "./controller"
-import { getAllFieldsDTO } from "../../types/form-fields";
+import { getAllFields, createField } from "./controller"
+import { getAllFieldsDTO, createFieldDTO } from "../../types/form-fields";
 import { Elysia } from "elysia";
 
 export const formFieldRoutes = new Elysia({ prefix: "/fields" })
   .use(requireAuth)
-  .get("/:formId", getAllFields, getAllFieldsDTO);
+  .get("/:formId", getAllFields, getAllFieldsDTO)
+  .post("/:formId", createField, createFieldDTO);
 

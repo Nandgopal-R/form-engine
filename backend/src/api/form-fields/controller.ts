@@ -1,6 +1,6 @@
 import { prisma } from "../../db/prisma"
 import { logger } from "../../logger/"
-import { GetAllFieldsContext } from "../../types/form-fields"
+import { GetAllFieldsContext, CreateFieldContext } from "../../types/form-fields"
 
 export async function getAllFields({ params, set }: GetAllFieldsContext) {
   const formExists = await prisma.form.count({
@@ -46,4 +46,51 @@ export async function getAllFields({ params, set }: GetAllFieldsContext) {
     message: "All form fields fetched successfully",
     data: fields
   }
+}
+
+export async function createField({ params, body, set, user }: CreateFieldContext) {
+
+  return prisma.$transaction(async (tx) => {
+    const form = await tx.form.findFirst({
+      where: {
+        id: params.formId,
+        ownerId: user.id
+      }
+    })
+
+    if (!form) {
+      set.status = 404
+      return {
+        success: false,
+        message: "Form not found"
+      }
+    }
+
+    const field = await tx.formFields.create({
+      data: {
+        fieldName: body.fieldName,
+        label: body.label,
+        fieldValueType: body.fieldValueType,
+        fieldType: body.fieldType,
+        validation: body.validation ?? undefined,
+        prevFieldId: body.prevFieldId,
+        formId: params.formId
+      }
+    })
+
+    if (body.prevFieldId) {
+      await tx.formFields.update({
+        where: { id: body.prevFieldId },
+        data: { nextField: field.id }
+      })
+    }
+
+    logger.info("Created new field for form", { formId: params.formId, fieldId: field.id, userId: user.id })
+    return {
+      success: true,
+      message: "Field created successfully",
+      data: field
+    }
+  })
+
 }
