@@ -17,12 +17,14 @@ model User {
   email         String   @unique
   name          String?
   emailVerified Boolean  @default(false)
-  image         String? // <--- Recommended: Stores profile picture
+  image         String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  sessions Session[]
-  accounts Account[]
+  sessions      Session[]
+  accounts      Account[]
+  forms         Form[]
+  formResponses FormResponse[]
 
   @@map("user")
 }
@@ -70,4 +72,68 @@ model Verification {
   updatedAt  DateTime @updatedAt
 
   @@map("verification")
+}
+
+model Form {
+  id          String  @id @default(uuid())
+  title       String
+  description String?
+  isPublished Boolean @default(false)
+  formUrl     String?
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  formFields    FormFields[]
+  formResponses FormResponse[]
+}
+
+model FormFields {
+  id             String  @id @default(uuid())
+  fieldName      String
+  label          String?
+  fieldValueType String // e.g., "string", "number", "boolean"
+  fieldType      String // e.g., "MCQ", "Radio", "Input"
+  validation     Json? // e.g., { "required": true, "min": 5 }
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 1. Link to the parent Form
+  formId String
+  form   Form   @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  // 2. Doubly Linked List Logic (Self-Relations)
+
+  // The "Previous" Field (Parent)
+  // This field stores the ID of the field passing control to this one
+  prevFieldId String?
+
+  // The "Next" Field (Child)
+  // This field is the virtual counterpart to the relation above. 
+  // We don't need a physical 'childFieldId' column because Prisma handles the other side of the relation automatically.
+  nextField String?
+
+  @@index([formId])
+  @@index([formId, prevFieldId])
+  @@map("form_fields")
+}
+
+model FormResponse {
+  id String @id @default(uuid())
+
+  formId String
+  form   Form   @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  respondentId String?
+  respondent   User?   @relation(fields: [respondentId], references: [id], onDelete: SetNull)
+
+  answers     Json
+  submittedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([formId])
+  @@map("form_response")
 }
