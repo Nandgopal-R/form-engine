@@ -1,0 +1,20 @@
+meta {
+  name: getAllFields
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:8000/fields/:formId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  formId: 00f09999-1714-4c57-8102-ea6f1ebc427a
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

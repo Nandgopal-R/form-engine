@@ -1,0 +1,33 @@
+meta {
+  name: createFields
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8000/fields/:formId
+  body: json
+  auth: inherit
+}
+
+params:path {
+  formId: 00f09999-1714-4c57-8102-ea6f1ebc427a
+}
+
+body:json {
+  {
+         "fieldName": "phone_number",
+         "label": "phone number",
+         "fieldValueType": "string",
+         "fieldType": "Input",
+         "validation": {
+           "required": true
+         },
+        "prevFieldId": "f4939527-6936-4398-a2a8-4cb8484d636b"
+      }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
