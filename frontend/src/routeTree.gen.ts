@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as LayoutIndexRouteImport } from './routes/_layout.index'
 import { Route as LayoutEditorRouteImport } from './routes/_layout.editor'
-import { Route as LayoutDashboardRouteImport } from './routes/_layout.dashboard'
 import { Route as LayoutAnalyticsRouteImport } from './routes/_layout.analytics'
 
 const LayoutRoute = LayoutRouteImport.update({
@@ -29,11 +28,6 @@ const LayoutEditorRoute = LayoutEditorRouteImport.update({
   path: '/editor',
   getParentRoute: () => LayoutRoute,
 } as any)
-const LayoutDashboardRoute = LayoutDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => LayoutRoute,
-} as any)
 const LayoutAnalyticsRoute = LayoutAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -43,12 +37,10 @@ const LayoutAnalyticsRoute = LayoutAnalyticsRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof LayoutIndexRoute
   '/analytics': typeof LayoutAnalyticsRoute
-  '/dashboard': typeof LayoutDashboardRoute
   '/editor': typeof LayoutEditorRoute
 }
 export interface FileRoutesByTo {
   '/analytics': typeof LayoutAnalyticsRoute
-  '/dashboard': typeof LayoutDashboardRoute
   '/editor': typeof LayoutEditorRoute
   '/': typeof LayoutIndexRoute
 }
@@ -56,20 +48,18 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_layout': typeof LayoutRouteWithChildren
   '/_layout/analytics': typeof LayoutAnalyticsRoute
-  '/_layout/dashboard': typeof LayoutDashboardRoute
   '/_layout/editor': typeof LayoutEditorRoute
   '/_layout/': typeof LayoutIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/analytics' | '/dashboard' | '/editor'
+  fullPaths: '/' | '/analytics' | '/editor'
   fileRoutesByTo: FileRoutesByTo
-  to: '/analytics' | '/dashboard' | '/editor' | '/'
+  to: '/analytics' | '/editor' | '/'
   id:
     | '__root__'
     | '/_layout'
     | '/_layout/analytics'
-    | '/_layout/dashboard'
     | '/_layout/editor'
     | '/_layout/'
   fileRoutesById: FileRoutesById
@@ -101,13 +91,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutEditorRouteImport
       parentRoute: typeof LayoutRoute
     }
-    '/_layout/dashboard': {
-      id: '/_layout/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof LayoutDashboardRouteImport
-      parentRoute: typeof LayoutRoute
-    }
     '/_layout/analytics': {
       id: '/_layout/analytics'
       path: '/analytics'
@@ -120,14 +103,12 @@ declare module '@tanstack/react-router' {
 
 interface LayoutRouteChildren {
   LayoutAnalyticsRoute: typeof LayoutAnalyticsRoute
-  LayoutDashboardRoute: typeof LayoutDashboardRoute
   LayoutEditorRoute: typeof LayoutEditorRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutAnalyticsRoute: LayoutAnalyticsRoute,
-  LayoutDashboardRoute: LayoutDashboardRoute,
   LayoutEditorRoute: LayoutEditorRoute,
   LayoutIndexRoute: LayoutIndexRoute,
 }
