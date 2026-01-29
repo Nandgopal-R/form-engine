@@ -1,0 +1,28 @@
+meta {
+  name: deleteField
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:8000/fields/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 7f51d536-cf4f-4686-96ba-480ebfacdf8c
+}
+
+body:json {
+  {
+         "validation": {
+           "required": false
+         }
+      }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { authController } from "./controller";
+import { auth } from "./index";
 
-export const authRoutes = new Elysia({ prefix: "/auth" })
-  .onRequest(({ request }) => authController(request));
+export const authRoutes = new Elysia()
+  .mount(auth.handler)

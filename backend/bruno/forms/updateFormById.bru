@@ -1,0 +1,26 @@
+meta {
+  name: updateFormById
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:8000/forms/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: ed95ba35-a2f3-4ada-b188-62345a84344b
+}
+
+body:json {
+  {
+    "description":"update description successfully of 3"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,10 +1,50 @@
 import { Elysia } from "elysia";
+import { cors } from "@elysiajs/cors";
 import { logger } from "./logger/index";
 import { authRoutes } from "./api/auth/routes"
+import { formRoutes } from "./api/forms/routes"
+import { formFieldRoutes } from "./api/form-fields/routes";
 
 const app = new Elysia()
-  .get("/", () => "🦊 Elysia server started")
-  .use(authRoutes);
+  .use(cors())
+
+  .onError(({ code, error, set, request }) => {
+    // A. Validation Errors (TypeBox)
+    if (code === "VALIDATION") {
+      set.status = 400;
+      return {
+        success: false,
+        message: "Invalid data provided",
+      };
+    }
+
+    // B. Handle 404s (Wrong URL)
+    if (code === "NOT_FOUND") {
+      set.status = 404;
+      return {
+        success: false,
+        message: "Resource not found",
+      };
+    }
+
+    // C. Handle known HTTP errors (e.g. invalid JSON body)
+    if (code === "PARSE") {
+      set.status = 400;
+      return { success: false, message: "Invalid JSON body" };
+    }
+
+    // D. The "Catch-All" for crashes
+    logger.error(`Server Error: ${request.method} ${request.url}`, { error });
+
+    set.status = 500;
+    return {
+      success: false,
+      message: "Internal server error",
+    };
+  }).get("/", () => "🦊 Elysia server started")
+  .use(authRoutes)
+  .use(formRoutes)
+  .use(formFieldRoutes);
 
 app.listen(8000);
 
