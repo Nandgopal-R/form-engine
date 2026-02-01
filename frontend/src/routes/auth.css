@@ -93,6 +93,7 @@ button {
     border: none;
     cursor: pointer;
     font-weight: 500;
+    transition: background 0.2s ease;
 }
 
 button[type="submit"] {
