@@ -1,0 +1,27 @@
+meta {
+  name: OAuth
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:8000/api/auth/sign-in/social
+  body: json
+  auth: inherit
+}
+
+headers {
+  Origin: http://localhost:8000
+}
+
+body:json {
+  {
+    "provider": "google",
+    "callbackURL": "http://localhost:8000" 
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
