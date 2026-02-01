@@ -1,6 +1,6 @@
 import { requireAuth } from "../auth/requireAuth";
-import { getAllForms, createForm, getFormById, updateForm } from "./controller";
-import { createFormDTO, getFormByIdDTO, updateFormDTO } from "../../types/forms";
+import { getAllForms, createForm, getFormById, updateForm, deleteForm } from "./controller";
+import { createFormDTO, getFormByIdDTO, updateFormDTO, deleteFormDTO } from "../../types/forms";
 import { Elysia } from "elysia";
 
 export const formRoutes = new Elysia({ prefix: "/forms" })
@@ -8,6 +8,7 @@ export const formRoutes = new Elysia({ prefix: "/forms" })
   .get("/", getAllForms)
   .post("/", createForm, createFormDTO)
   .get("/:id", getFormById, getFormByIdDTO)
-  .put("/:id", updateForm, updateFormDTO);
+  .put("/:id", updateForm, updateFormDTO)
+  .delete("/:id", deleteForm, deleteFormDTO);
 
 
