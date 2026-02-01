@@ -44,3 +44,15 @@ export interface UpdateFormContext extends Context {
   params: Static<typeof updateFormDTO.params>;
   body: Static<typeof updateFormDTO.body>;
 }
+
+export const deleteFormDTO = {
+  params: t.Object({
+    id: t.String({
+      format: "uuid"
+    }),
+  }),
+}
+
+export interface DeleteFormContext extends Context {
+  params: Static<typeof deleteFormDTO.params>;
+}

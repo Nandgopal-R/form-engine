@@ -1,6 +1,6 @@
 import { prisma } from "../../db/prisma"
 import { logger } from "../../logger/"
-import { Context, CreateFormContext, GetFormByIdContext, UpdateFormContext } from "../../types/forms"
+import { Context, CreateFormContext, GetFormByIdContext, UpdateFormContext, DeleteFormContext } from "../../types/forms"
 
 export async function getAllForms({ user }: Context) {
   const forms = await prisma.form.findMany({
@@ -106,3 +106,26 @@ export async function updateForm({ user, params, body, set }: UpdateFormContext)
   }
 }
 
+export async function deleteForm({ user, params, set }: DeleteFormContext) {
+  const form = await prisma.form.deleteMany({
+    where: {
+      id: params.id,
+      ownerId: user.id,
+    }
+  })
+
+  if (form.count === 0) {
+    logger.warn("Attempted to delete non-existent form", { userId: user.id, formId: params.id })
+    set.status = 404
+    return {
+      success: false,
+      message: "Form not found",
+    }
+  }
+
+  logger.info("Deleted form for user", { userId: user.id, formId: params.id })
+  return {
+    success: true,
+    message: "Form deleted successfully",
+  }
+}
