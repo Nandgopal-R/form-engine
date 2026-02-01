@@ -1,0 +1,167 @@
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont;
+    background-color: #0f0f0f;
+    color: #e5e5e5;
+}
+
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-title {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    letter-spacing: 1px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: #181818;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+}
+
+.auth-card h2 {
+    margin-bottom: 6px;
+}
+
+.auth-subtitle {
+    font-size: 14px;
+    color: #a1a1aa;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+label {
+    font-size: 13px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    background: #121212;
+    border: 1px solid #2a2a2a;
+    color: white;
+    box-sizing: border-box;
+}
+
+input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper input {
+    padding-right: 44px;
+}
+
+.eye {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #9ca3af;
+    font-size: 18px;
+}
+
+.eye:hover {
+    color: white;
+}
+
+button {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+button[type="submit"] {
+    background: #f4f4f5;
+    color: black;
+}
+
+.secondary-btn {
+    margin-top: 12px;
+    background: #1f1f1f;
+    color: white;
+    border: 1px solid #2f2f2f;
+    width: 100%;
+}
+
+.secondary-btn:hover {
+    background: #2a2a2a;
+}
+
+.footer-text {
+    margin-top: 14px;
+    font-size: 13px;
+    text-align: center;
+    color: #a1a1aa;
+}
+
+.footer-text a {
+    color: white;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.footer-text a:hover {
+    text-decoration: underline;
+}
+
+.error {
+    color: #ef4444;
+    font-size: 13px;
+}
+
+.helper-text {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.strength-bar {
+    width: 100%;
+    height: 6px;
+    background: #2a2a2a;
+    border-radius: 4px;
+}
+
+.strength-fill {
+    height: 100%;
+    border-radius: 4px;
+}
+
+.strength-fill.weak {
+    width: 33%;
+    background: #ef4444;
+}
+
+.strength-fill.medium {
+    width: 66%;
+    background: #facc15;
+}
+
+.strength-fill.strong {
+    width: 100%;
+    background: #22c55e;
+}

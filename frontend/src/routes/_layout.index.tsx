@@ -1,10 +1,14 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { FormCard } from '@/components/form-card'
 import { Button } from '@/components/ui/button'
 import { Filter } from 'lucide-react'
 
 export const Route = createFileRoute('/_layout/')({
-  component: DashboardPage,
+  beforeLoad: () => {
+    throw redirect({
+      to: '/signin',
+    })
+  },
 })
 
 //temp
