@@ -54,6 +54,12 @@ jobs:
       working-directory: ./backend
       run: bun install
 
+    - name: Generate Prisma client
+      working-directory: ./backend
+      run: bunx prisma generate
+      env:
+        DATABASE_URL: postgresql://postgres:1234@localhost:5432/test_db
+
     - name: Code quality check (Biome)
       working-directory: ./backend
       run: bun run check
@@ -61,12 +67,6 @@ jobs:
     - name: Type checking
       working-directory: ./backend
       run: bun run typecheck
-
-    - name: Generate Prisma client
-      working-directory: ./backend
-      run: bunx prisma generate
-      env:
-        DATABASE_URL: postgresql://postgres:1234@localhost:5432/test_db
 
     - name: Run database migrations
       working-directory: ./backend
