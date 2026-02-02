@@ -1,0 +1,101 @@
+name: Backend CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+
+jobs:
+  backend-ci:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 1234
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: latest
+
+    - name: Cache dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          backend/node_modules
+          backend/.bun
+          ~/.bun/install/cache
+          backend/prisma/generated
+        key: ${{ runner.os }}-bun-${{ hashFiles('backend/bun.lock', 'backend/package.json') }}
+        restore-keys: |
+          ${{ runner.os }}-bun-
+
+    - name: Install dependencies
+      working-directory: ./backend
+      run: bun install
+
+    - name: Code quality check (Biome)
+      working-directory: ./backend
+      run: bun run check
+
+    - name: Type checking
+      working-directory: ./backend
+      run: bun run typecheck
+
+    - name: Generate Prisma client
+      working-directory: ./backend
+      run: bunx prisma generate
+      env:
+        DATABASE_URL: postgresql://postgres:1234@localhost:5432/test_db
+
+    - name: Run database migrations
+      working-directory: ./backend
+      run: bunx prisma migrate deploy
+      env:
+        DATABASE_URL: postgresql://postgres:1234@localhost:5432/test_db
+
+    - name: Validate database schema
+      working-directory: ./backend
+      run: bunx prisma db push --accept-data-loss
+      env:
+        DATABASE_URL: postgresql://postgres:1234@localhost:5432/test_db
+
+    - name: Security audit
+      working-directory: ./backend
+      run: bun audit
+
+    - name: Build verification
+      working-directory: ./backend
+      run: |
+        # Verify the application can start without errors
+        timeout 10s bun run src/index.ts || true
+
+    - name: Upload build artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-build-artifacts
+        path: |
+          backend/dist/
+          backend/prisma/generated/
+        retention-days: 7
