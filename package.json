@@ -13,6 +13,10 @@
     "backend/**/*.{ts,js,json}": [
       "bunx biome check --write",
       "bunx biome check"
+    ],
+    ".github/**/*.yml": [
+      "bunx biome check --write",
+      "bunx biome check"
     ]
   },
   "dependencies": {
