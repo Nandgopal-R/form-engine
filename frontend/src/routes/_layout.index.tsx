@@ -2,13 +2,31 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import { FormCard } from '@/components/form-card'
 import { Button } from '@/components/ui/button'
 import { Filter } from 'lucide-react'
+import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute('/_layout/')({
-  beforeLoad: () => {
-    throw redirect({
-      to: '/signin',
-    })
+  beforeLoad: async () => {
+    // Only redirect if we can verify the user is NOT logged in.
+    // getSession is asynchronous.
+    try {
+      const { data: session } = await authClient.getSession();
+      if (!session) {
+        throw redirect({
+          to: '/signin',
+        })
+      }
+    } catch (error: any) {
+      // If it's a release (redirect) error, re-throw it
+      if (error?.isRedirect) {
+        throw error;
+      }
+      // If fetch fails (backend down/cors), treat as logged out and redirect
+      throw redirect({
+        to: '/signin',
+      })
+    }
   },
+  component: DashboardPage,
 })
 
 //temp
