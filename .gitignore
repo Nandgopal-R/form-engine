@@ -5,6 +5,7 @@ node_modules/
 
 # Build and distribution output
 /dist
+backend/dist/
 /dist-ssr
 /build
 /out
