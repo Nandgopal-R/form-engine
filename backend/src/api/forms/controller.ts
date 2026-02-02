@@ -1,6 +1,12 @@
-import { prisma } from "../../db/prisma"
-import { logger } from "../../logger/"
-import { Context, CreateFormContext, GetFormByIdContext, UpdateFormContext, DeleteFormContext } from "../../types/forms"
+import { prisma } from "../../db/prisma";
+import { logger } from "../../logger/";
+import type {
+  Context,
+  CreateFormContext,
+  DeleteFormContext,
+  GetFormByIdContext,
+  UpdateFormContext,
+} from "../../types/forms";
 
 export async function getAllForms({ user }: Context) {
   const forms = await prisma.form.findMany({
@@ -8,26 +14,29 @@ export async function getAllForms({ user }: Context) {
       id: true,
       title: true,
       isPublished: true,
-      createdAt: true
+      createdAt: true,
     },
-    where: { ownerId: user.id }
-  })
+    where: { ownerId: user.id },
+  });
 
   if (forms.length === 0) {
-    logger.info("No forms found for user", { userId: user.id })
+    logger.info("No forms found for user", { userId: user.id });
     return {
       success: true,
       message: "No forms found",
-      data: []
-    }
+      data: [],
+    };
   }
 
-  logger.info("Fetched all forms for user", { userId: user.id, formCount: forms.length })
+  logger.info("Fetched all forms for user", {
+    userId: user.id,
+    formCount: forms.length,
+  });
   return {
     success: true,
     message: "All forms fetched successfully",
-    data: forms
-  }
+    data: forms,
+  };
 }
 
 export async function createForm({ user, body }: CreateFormContext) {
@@ -36,14 +45,17 @@ export async function createForm({ user, body }: CreateFormContext) {
       title: body.title,
       description: body.description,
       ownerId: user.id,
-    }
-  })
-  logger.info("Created new form for user", { userId: user.id, formId: form.id })
+    },
+  });
+  logger.info("Created new form for user", {
+    userId: user.id,
+    formId: form.id,
+  });
   return {
     success: true,
     message: "Form created successfully",
-    data: form
-  }
+    data: form,
+  };
 }
 
 export async function getFormById({ user, params, set }: GetFormByIdContext) {
@@ -51,41 +63,46 @@ export async function getFormById({ user, params, set }: GetFormByIdContext) {
     where: {
       id: params.id,
       ownerId: user.id,
-    }
-  })
+    },
+  });
 
   if (!form) {
-    set.status = 404
+    set.status = 404;
     return {
       success: false,
       message: "Form not found",
-    }
+    };
   }
 
-  logger.info("Fetched form for user", { userId: user.id, formId: form.id })
+  logger.info("Fetched form for user", { userId: user.id, formId: form.id });
   return {
     success: true,
     message: "Form fetched successfully",
-    data: form
-  }
+    data: form,
+  };
 }
 
-export async function updateForm({ user, params, body, set }: UpdateFormContext) {
-  // We use findFirst first to ensure ownership and existence before updating, 
+export async function updateForm({
+  user,
+  params,
+  body,
+  set,
+}: UpdateFormContext) {
+  // We use findFirst first to ensure ownership and existence before updating,
   // as prisma.update throws if not found.
   const existing = await prisma.form.findFirst({
     where: {
       id: params.id,
       ownerId: user.id,
-    }
-  })
+    },
+  });
 
   if (!existing) {
-    set.status = 404
+    set.status = 404;
     return {
       success: false,
       message: "Form not found",
-    }
+    };
   }
 
   const form = await prisma.form.update({
@@ -95,15 +112,15 @@ export async function updateForm({ user, params, body, set }: UpdateFormContext)
     data: {
       title: body.title,
       description: body.description,
-    }
-  })
+    },
+  });
 
-  logger.info("Updated form for user", { userId: user.id, formId: form.id })
+  logger.info("Updated form for user", { userId: user.id, formId: form.id });
   return {
     success: true,
     message: "Form updated successfully",
-    data: form
-  }
+    data: form,
+  };
 }
 
 export async function deleteForm({ user, params, set }: DeleteFormContext) {
@@ -111,21 +128,24 @@ export async function deleteForm({ user, params, set }: DeleteFormContext) {
     where: {
       id: params.id,
       ownerId: user.id,
-    }
-  })
+    },
+  });
 
   if (form.count === 0) {
-    logger.warn("Attempted to delete non-existent form", { userId: user.id, formId: params.id })
-    set.status = 404
+    logger.warn("Attempted to delete non-existent form", {
+      userId: user.id,
+      formId: params.id,
+    });
+    set.status = 404;
     return {
       success: false,
       message: "Form not found",
-    }
+    };
   }
 
-  logger.info("Deleted form for user", { userId: user.id, formId: params.id })
+  logger.info("Deleted form for user", { userId: user.id, formId: params.id });
   return {
     success: true,
     message: "Form deleted successfully",
-  }
+  };
 }

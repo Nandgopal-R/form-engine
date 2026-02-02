@@ -1,6 +1,6 @@
-import { Elysia } from "elysia";
-import { auth } from "./index";
+import type { Elysia } from "elysia";
 import { logger } from "../../logger/";
+import { auth } from "./index";
 
 interface User {
   id: string;
