@@ -3,10 +3,11 @@
   "vcs": {
     "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": true
+    "useIgnoreFile": false
   },
   "files": {
-    "ignoreUnknown": true
+    "ignoreUnknown": true,
+    "includes": ["src/**"]
   },
   "formatter": {
     "enabled": true,
@@ -19,6 +20,12 @@
       "correctness": {
         "noUnusedImports": "error",
         "noUnusedVariables": "error"
+      },
+      "style": {
+        "noNonNullAssertion": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off"
       }
     }
   },
@@ -26,9 +33,7 @@
     "formatter": {
       "quoteStyle": "double"
     },
-    "globals": [
-      "Bun"
-    ]
+    "globals": ["Bun"]
   },
   "assist": {
     "enabled": true,

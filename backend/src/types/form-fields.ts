@@ -1,4 +1,4 @@
-import { t, type Static } from "elysia";
+import { type Static, t } from "elysia";
 
 export interface Context {
   user: { id: string };
@@ -8,7 +8,7 @@ export interface Context {
 export const getAllFieldsDTO = {
   params: t.Object({
     formId: t.String({
-      format: "uuid"
+      format: "uuid",
     }),
   }),
 };
@@ -29,9 +29,11 @@ export const createFieldDTO = {
     fieldValueType: t.String(),
     fieldType: t.String(),
     validation: t.Optional(t.Any()),
-    prevFieldId: t.Optional(t.String({
-      format: "uuid",
-    })),
+    prevFieldId: t.Optional(
+      t.String({
+        format: "uuid",
+      }),
+    ),
   }),
 };
 

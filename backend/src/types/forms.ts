@@ -1,4 +1,4 @@
-import { t, type Static } from "elysia";
+import { type Static, t } from "elysia";
 
 export interface Context {
   user: { id: string };
@@ -19,7 +19,7 @@ export interface CreateFormContext extends Context {
 export const getFormByIdDTO = {
   params: t.Object({
     id: t.String({
-      format: "uuid"
+      format: "uuid",
     }),
   }),
 };
@@ -31,7 +31,7 @@ export interface GetFormByIdContext extends Context {
 export const updateFormDTO = {
   params: t.Object({
     id: t.String({
-      format: "uuid"
+      format: "uuid",
     }),
   }),
   body: t.Object({
@@ -48,10 +48,10 @@ export interface UpdateFormContext extends Context {
 export const deleteFormDTO = {
   params: t.Object({
     id: t.String({
-      format: "uuid"
+      format: "uuid",
     }),
   }),
-}
+};
 
 export interface DeleteFormContext extends Context {
   params: Static<typeof deleteFormDTO.params>;

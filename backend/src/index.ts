@@ -1,9 +1,9 @@
-import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
-import { logger } from "./logger/index";
-import { authRoutes } from "./api/auth/routes"
-import { formRoutes } from "./api/forms/routes"
+import { Elysia } from "elysia";
+import { authRoutes } from "./api/auth/routes";
 import { formFieldRoutes } from "./api/form-fields/routes";
+import { formRoutes } from "./api/forms/routes";
+import { logger } from "./logger/index";
 
 const app = new Elysia()
   .use(cors())
@@ -41,7 +41,8 @@ const app = new Elysia()
       success: false,
       message: "Internal server error",
     };
-  }).get("/", () => "🦊 Elysia server started")
+  })
+  .get("/", () => "🦊 Elysia server started")
   .use(authRoutes)
   .use(formRoutes)
   .use(formFieldRoutes);

@@ -6,24 +6,29 @@
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "check": "biome check .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build": "bun build src/index.ts --outdir dist --target bun --minify"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.1",
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
-    "better-auth": "^1.4.12",
-    "elysia": "^1.0.0",
-    "pg": "^8.17.2",
-    "pino": "^10.1.1"
+    "better-auth": "^1.4.18",
+    "elysia": "^1.4.22",
+    "pg": "^8.18.0",
+    "pino": "^10.3.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.11",
+    "@biomejs/biome": "^2.3.13",
     "@types/bun": "latest",
     "@types/pg": "^8.16.0",
     "pino-pretty": "^13.1.3",
-    "prisma": "7.3.0",
-    "typescript": "^5.3.0"
+    "prisma": "^7.3.0",
+    "typescript": "^5.9.3"
+  },
+  "resolutions": {
+    "hono": "^4.11.7",
+    "lodash": "^4.17.23"
   },
   "module": "src/index.ts"
 }
