@@ -75,7 +75,7 @@ export async function createField({
     };
   }
 
-  const field = await prisma.$transaction(async (tx) => {
+  const field = await prisma.$transaction(async (tx: any) => {
     // 1. If we are inserting after a specific field (prevFieldId provided)
     if (body.prevFieldId) {
       // Fetch the previous field to see if it has a next field
@@ -202,7 +202,7 @@ export async function deleteField({ params, set, user }: DeleteFieldContext) {
     return { success: false, message: "Unauthorized" };
   }
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: any) => {
     // 1. Link Previous to Next
     if (field.prevFieldId) {
       await tx.formFields.update({
