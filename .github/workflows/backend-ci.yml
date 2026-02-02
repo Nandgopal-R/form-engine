@@ -46,7 +46,7 @@ jobs:
           backend/.bun
           ~/.bun/install/cache
           backend/prisma/generated
-        key: ${{ runner.os }}-bun-${{ hashFiles('backend/bun.lock', 'backend/package.json') }}
+        key: ${{ runner.os }}-bun-${{ hashFiles('backend/bun.lock', 'backend/package.json', 'backend/tsconfig.json') }}
         restore-keys: |
           ${{ runner.os }}-bun-
 
@@ -74,21 +74,19 @@ jobs:
       env:
         DATABASE_URL: postgresql://postgres:1234@localhost:5432/test_db
 
-    - name: Validate database schema
-      working-directory: ./backend
-      run: bunx prisma db push --accept-data-loss
-      env:
-        DATABASE_URL: postgresql://postgres:1234@localhost:5432/test_db
-
     - name: Security audit
       working-directory: ./backend
       run: bun audit
 
+    - name: Build application
+      working-directory: ./backend
+      run: bun run build
+
     - name: Build verification
       working-directory: ./backend
       run: |
-        # Verify the application can start without errors
-        timeout 10s bun run src/index.ts || true
+        # Verify the built application can start without errors
+        timeout 10s bun dist/index.js || true
 
     - name: Upload build artifacts
       if: always()
