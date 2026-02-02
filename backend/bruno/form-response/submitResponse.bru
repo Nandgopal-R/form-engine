@@ -1,0 +1,29 @@
+meta {
+  name: submitResponse
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8000/responses/:formId
+  body: json
+  auth: inherit
+}
+
+params:path {
+  formId: fdb4db57-695f-4a2e-aa2d-674b2f188238
+}
+
+body:json {
+  {
+    "answers":{
+      "063a2bbb-99e5-492f-ad98-afbca86283ca": "Jack",
+      "99f13fb0-6100-4f6d-9460-476c0f20967d": "999999999"
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
