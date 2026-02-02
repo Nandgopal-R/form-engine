@@ -1,7 +1,9 @@
 {
-  "include": ["**/*.ts", "**/*.tsx", "eslint.config.js", "prettier.config.js", "vite.config.js"],
+  "include": ["src","**/*.ts", "**/*.tsx", "eslint.config.js", "prettier.config.js", "vite.config.js"],
   
   "compilerOptions": {
+    "allowJs":true,
+    "checkJs":false,
     "target": "ES2022",
     "jsx": "react-jsx",
     "module": "ESNext",
