@@ -1,5 +1,6 @@
-import { createFileRoute, Outlet, useMatches } from '@tanstack/react-router'
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
+import { Link, Outlet, createFileRoute, useMatches  } from '@tanstack/react-router'
+
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/app-sidebar'
 import { Separator } from '@/components/ui/separator'
 import {
@@ -10,7 +11,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
-import { Link } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_layout')({
   component: LayoutComponent,

@@ -1,11 +1,11 @@
 "use client"
 import * as React from "react"
 import {
-  LayoutDashboard,
-  FileEdit,
   BarChart3,
-  Settings,
+  FileEdit,
+  LayoutDashboard,
   Plus,
+  Settings,
 } from "lucide-react"
 import { NavMain } from "@/components/nav-main"
 import {

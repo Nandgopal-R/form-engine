@@ -1,8 +1,8 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { useState } from "react";
-import { authClient } from "@/lib/auth-client";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { z } from "zod";
+import { authClient } from "@/lib/auth-client";
 
 const signupSchema = z.object({
     name: z.string().min(2, "Name is required"),
