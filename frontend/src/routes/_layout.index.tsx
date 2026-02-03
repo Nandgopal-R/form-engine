@@ -6,8 +6,6 @@ import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute('/_layout/')({
   beforeLoad: async () => {
-    // Only redirect if we can verify the user is NOT logged in.
-    // getSession is asynchronous.
     try {
       const { data: session } = await authClient.getSession();
       if (!session) {
@@ -16,11 +14,9 @@ export const Route = createFileRoute('/_layout/')({
         })
       }
     } catch (error: any) {
-      // If it's a release (redirect) error, re-throw it
       if (error?.isRedirect) {
         throw error;
       }
-      // If fetch fails (backend down/cors), treat as logged out and redirect
       throw redirect({
         to: '/signin',
       })

@@ -34,7 +34,6 @@ function Signup() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    // Still useful for UI feedback even with Zod
     const isValidGmail = email.endsWith("@gmail.com");
 
     const getPasswordStrength = (pwd: string) => {
@@ -67,7 +66,6 @@ function Signup() {
             return;
         }
 
-        // Zod for strength/complexity checks
         const validation = signupSchema.safeParse({ name, email, password, confirmPassword });
         if (!validation.success) {
             setError(validation.error.errors[0].message);
@@ -88,7 +86,6 @@ function Signup() {
             },
             onError: (ctx) => {
                 setLoading(false);
-                // If backend is down/cors error, show specific message or the raw error
                 if (ctx.error.status === 0 || ctx.error.message === "Failed to fetch") {
                     setError("Backend not connected (CORS/Network error).");
                 } else {
