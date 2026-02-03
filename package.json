@@ -11,8 +11,7 @@
   },
   "lint-staged": {
     "backend/**/*.{ts,js,json}": [
-      "bunx biome format --write",
-      "bunx biome check --no-errors-on-unmatched"
+      "bunx biome check --write --no-errors-on-unmatched"
     ],
     "frontend/**/*.{ts,tsx,js,jsx,json}": [
       "bunx biome format --write",
