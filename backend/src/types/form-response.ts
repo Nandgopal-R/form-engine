@@ -56,3 +56,15 @@ export interface ResumeResponseContext extends Context {
   params: Static<typeof resumeResponseDTO.params>;
   body: Static<typeof resumeResponseDTO.body>;
 }
+
+export const formResponseForFormOwnerDTO = {
+  params: t.Object({
+    formId: t.String({
+      format: "uuid",
+    }),
+  }),
+};
+
+export interface FormResponseForFormOwnerContext extends Context {
+  params: Static<typeof formResponseForFormOwnerDTO.params>;
+}

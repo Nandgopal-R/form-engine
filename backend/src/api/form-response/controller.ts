@@ -2,6 +2,7 @@ import { prisma } from "../../db/prisma";
 import { logger } from "../../logger/";
 import type {
   FormResponseContext,
+  FormResponseForFormOwnerContext,
   ResumeResponseContext,
 } from "../../types/form-response";
 
@@ -80,5 +81,49 @@ export async function resumeResponse({
     success: true,
     message: "Response updated successfully",
     data: response,
+  };
+}
+
+export async function getResponseForFormOwner({
+  params,
+  user,
+  set,
+}: FormResponseForFormOwnerContext) {
+  const form = await prisma.form.findUnique({
+    where: {
+      id: params.formId,
+      ownerId: user.id,
+    },
+  });
+
+  if (!form) {
+    logger.warn(
+      `Form with ID ${params.formId} not found or does not belong to user ${user.id}`,
+    );
+    set.status = 404;
+    return {
+      success: false,
+      message: "Form not found or access denied",
+    };
+  }
+
+  const responses = await prisma.formResponse.findMany({
+    where: {
+      formId: params.formId,
+    },
+  });
+  if (responses.length === 0) {
+    logger.warn(`No responses found for form ID ${params.formId}`);
+    return {
+      success: false,
+      message: "No responses found for this form",
+    };
+  }
+
+  logger.info(`Retrieved responses for form ID ${params.formId}`);
+  return {
+    success: true,
+    message: "Responses retrieved successfully",
+    data: responses,
   };
 }
