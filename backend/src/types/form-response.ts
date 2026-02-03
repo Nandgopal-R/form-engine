@@ -1,4 +1,4 @@
-import { t, type Static } from "elysia";
+import { type Static, t } from "elysia";
 
 export interface Context {
   user: { id: string };
@@ -14,16 +14,17 @@ export const formResponseDTO = {
   body: t.Object({
     answers: t.Record(
       t.String(), // Key: The Field ID (UUID or String)
-      t.Union([   // Value: Can be String, Number, Boolean, or Array (for checkboxes)
+      t.Union([
+        // Value: Can be String, Number, Boolean, or Array (for checkboxes)
         t.String(),
         t.Number(),
         t.Boolean(),
         t.Array(t.String()),
-        t.Null()
+        t.Null(),
       ]),
-    )
+    ),
   }),
-}
+};
 
 export interface FormResponseContext extends Context {
   params: Static<typeof formResponseDTO.params>;
@@ -39,19 +40,19 @@ export const resumeResponseDTO = {
   body: t.Object({
     answers: t.Record(
       t.String(), // Key: The Field ID (UUID or String)
-      t.Union([   // Value: Can be String, Number, Boolean, or Array (for checkboxes)
+      t.Union([
+        // Value: Can be String, Number, Boolean, or Array (for checkboxes)
         t.String(),
         t.Number(),
         t.Boolean(),
         t.Array(t.String()),
-        t.Null()
+        t.Null(),
       ]),
-    )
+    ),
   }),
-}
+};
 
 export interface ResumeResponseContext extends Context {
   params: Static<typeof resumeResponseDTO.params>;
   body: Static<typeof resumeResponseDTO.body>;
 }
-

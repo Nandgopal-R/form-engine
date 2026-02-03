@@ -11,15 +11,20 @@
   },
   "lint-staged": {
     "backend/**/*.{ts,js,json}": [
-      "bunx biome check --write",
-      "bunx biome check"
+      "bunx biome format --write",
+      "bunx biome check --no-errors-on-unmatched"
+    ],
+    "frontend/**/*.{ts,tsx,js,jsx,json}": [
+      "bunx biome format --write",
+      "bunx biome check --no-errors-on-unmatched --linter-enabled=false"
     ],
     ".github/**/*.yml": [
-      "bunx biome check --write",
-      "bunx biome check"
+      "bunx biome format --write",
+      "bunx biome check --no-errors-on-unmatched"
     ]
   },
   "dependencies": {
+    "@biomejs/biome": "^2.3.14",
     "@tanstack/react-query": "^5.90.20",
     "@tanstack/react-router": "^1.157.16",
     "@tanstack/react-router-devtools": "^1.157.16"
