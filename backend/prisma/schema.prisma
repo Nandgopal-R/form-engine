@@ -111,11 +111,6 @@ model FormFields {
   // This field stores the ID of the field passing control to this one
   prevFieldId String?
 
-  // The "Next" Field (Child)
-  // This field is the virtual counterpart to the relation above. 
-  // We don't need a physical 'childFieldId' column because Prisma handles the other side of the relation automatically.
-  nextField String?
-
   @@index([formId])
   @@index([formId, prevFieldId])
   @@map("form_fields")
