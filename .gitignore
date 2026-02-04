@@ -1,21 +1,13 @@
 # Node and Bun dependencies
-# Usually, you should commit the lockfile to ensure reproducible builds.
-# If you want to commit it, remove 'bun.lockb' from this file.
 node_modules/
 
 # Build and distribution output
-/dist
-backend/dist/
-/dist-ssr
-/build
-/out
-/.next/
-/.nitro/
-.vercel/
-.wrangler/
+dist/
+build/
+out/
+coverage/
 
 # Environment variables
-# Don't commit .env files. Use .env.example for templates.
 .env
 .env.*
 !.env.example
@@ -33,15 +25,14 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
-o
+
 # OS-generated files
 .DS_Store
 Thumbs.db
 
 # Temporary and generated files
-/coverage
-/.pnp
-.pnp.js
+*.tmp
+*.temp
 *.pem
 *.trace
 *.zip
@@ -49,4 +40,3 @@ Thumbs.db
 *.tgz
 count.txt
 /src/generated/prisma
-/.tanstack/

@@ -7,14 +7,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": [
-      "backend/src/**/*.{ts,js,json}",
-      "frontend/src/**/*.{ts,js,json,tsx,jsx}",
-      "backend/*.json",
-      "frontend/*.json",
-      "*.json",
-      ".github/**/*.yml"
-    ]
+    "includes": ["src/**/*.{ts,js,json}", "*.json", ".github/**/*.yml"]
   },
   "formatter": {
     "enabled": true,
