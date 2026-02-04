@@ -68,3 +68,15 @@ export const formResponseForFormOwnerDTO = {
 export interface FormResponseForFormOwnerContext extends Context {
   params: Static<typeof formResponseForFormOwnerDTO.params>;
 }
+
+export const getSubmittedResponseDTO = {
+  params: t.Object({
+    formId: t.String({
+      format: "uuid",
+    }),
+  }),
+};
+
+export interface GetSubmittedResponseContext extends Context {
+  params: Static<typeof getSubmittedResponseDTO.params>;
+}

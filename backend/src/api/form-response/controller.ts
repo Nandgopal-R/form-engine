@@ -3,6 +3,7 @@ import { logger } from "../../logger/";
 import type {
   FormResponseContext,
   FormResponseForFormOwnerContext,
+  GetSubmittedResponseContext,
   ResumeResponseContext,
 } from "../../types/form-response";
 
@@ -111,6 +112,16 @@ export async function getResponseForFormOwner({
     where: {
       formId: params.formId,
     },
+    select: {
+      id: true,
+      formId: true,
+      answers: true,
+      form: {
+        select: {
+          title: true,
+        },
+      },
+    },
   });
   if (responses.length === 0) {
     logger.warn(`No responses found for form ID ${params.formId}`);
@@ -120,10 +131,117 @@ export async function getResponseForFormOwner({
     };
   }
 
+  const fields = await prisma.formFields.findMany({
+    where: {
+      formId: params.formId,
+    },
+    select: {
+      id: true,
+      fieldName: true,
+    },
+  });
+
+  const fieldIdToNameMap = Object.fromEntries(
+    fields.map((f) => [f.id, f.fieldName]),
+  );
+
+  const formattedResponses = responses.map((r) => {
+    const transformedAnswers: Record<string, any> = {};
+
+    for (const [fieldId, value] of Object.entries(
+      r.answers as Record<string, any>,
+    )) {
+      const fieldName = fieldIdToNameMap[fieldId] ?? fieldId;
+      transformedAnswers[fieldName] = value;
+    }
+
+    return {
+      id: r.id,
+      formId: r.formId,
+      formTitle: r.form.title,
+      answers: transformedAnswers,
+    };
+  });
+
   logger.info(`Retrieved responses for form ID ${params.formId}`);
   return {
     success: true,
     message: "Responses retrieved successfully",
-    data: responses,
+    data: formattedResponses,
+  };
+}
+
+export async function getSubmittedResponse({
+  params,
+  user,
+  set,
+}: GetSubmittedResponseContext) {
+  const response = await prisma.formResponse.findMany({
+    where: {
+      respondentId: user.id,
+      formId: params.formId,
+    },
+    select: {
+      id: true,
+      formId: true,
+      answers: true,
+      form: {
+        select: {
+          title: true,
+        },
+      },
+    },
+  });
+
+  if (response.length === 0) {
+    logger.warn(
+      `No response found for user ${user.id} on form ${params.formId}`,
+    );
+    set.status = 404;
+    return {
+      success: false,
+      message: "No response found for this form",
+    };
+  }
+
+  const fields = await prisma.formFields.findMany({
+    where: {
+      formId: params.formId,
+    },
+    select: {
+      id: true,
+      fieldName: true,
+    },
+  });
+
+  const fieldIdToNameMap = Object.fromEntries(
+    fields.map((f) => [f.id, f.fieldName]),
+  );
+
+  const formattedResponses = response.map((r) => {
+    const transformedAnswers: Record<string, any> = {};
+
+    for (const [fieldId, value] of Object.entries(
+      r.answers as Record<string, any>,
+    )) {
+      const fieldName = fieldIdToNameMap[fieldId] ?? fieldId;
+      transformedAnswers[fieldName] = value;
+    }
+
+    return {
+      id: r.id,
+      formId: r.formId,
+      formTitle: r.form.title,
+      answers: transformedAnswers,
+    };
+  });
+
+  logger.info(
+    `Retrieved response for user ${user.id} on form ${params.formId}`,
+  );
+  return {
+    success: true,
+    message: "Response retrieved successfully",
+    data: formattedResponses,
   };
 }
