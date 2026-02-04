@@ -1,0 +1,30 @@
+meta {
+  name: submitResponse
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8000/responses/:formId
+  body: json
+  auth: inherit
+}
+
+params:path {
+  formId: ef50e45d-d095-418d-ab49-7196900fa5c2
+}
+
+body:json {
+  {
+    "answers":{
+      "575f5192-d46c-4974-bb0c-f909d9fb80ce": "Jack",
+      "894b4cf0-1320-4403-b116-8504f23ef6e3": "jack@gmail.com",
+      "15026215-127b-44bc-8a06-a12e33f79802":"3"
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
