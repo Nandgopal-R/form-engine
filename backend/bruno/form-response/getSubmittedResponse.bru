@@ -1,0 +1,20 @@
+meta {
+  name: getSubmittedResponse
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://localhost:8000/responses/:formId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  formId: ef50e45d-d095-418d-ab49-7196900fa5c2
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
