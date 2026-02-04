@@ -8,7 +8,6 @@ The platform helps colleges efficiently collect data for use cases such as event
 
 ## Features
 
-- Drag-and-drop form builder
 - Support for multiple field types
 - Built-in validation rules for accurate data collection
 - Real-time form preview before publishing
