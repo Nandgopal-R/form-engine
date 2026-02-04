@@ -18,3 +18,49 @@ The platform helps colleges efficiently collect data for use cases such as event
 
 ---
 
+## Getting Started
+
+### Prerequisites
+
+- [Bun](https://bun.sh/) (latest version)
+- [Docker](https://www.docker.com/) (for running the database)
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <https://github.com/Nandgopal-R/form-engine.git>
+   cd form-engine
+   ```
+
+2. Install dependencies:
+   ```bash
+   bun install
+   ```
+
+3. Set up the environment variables:
+   - Copy `.env.example` to `.env` and fill in with your secret keys.
+
+4. Start the database:
+   ```bash
+   docker-compose up -d
+   ```
+
+5. Run database migrations:
+   ```bash
+   bunx prisma migrate dev
+   ```
+
+### Development Scripts
+
+- `bun run dev`: Start the development server with hot-reloading.
+- `bun run check`: Run Biome for linting and formatting checks.
+- `bun run typecheck`: Run TypeScript type checking.
+- `bun run build`: Build the application for production.
+
+### Project Structure
+
+- `src/`: Backend source code.
+- `prisma/`: Database schema and migrations.
+- `bruno/`: Bruno API collection for testing endpoints.
+- `dist/`: Production build output.
