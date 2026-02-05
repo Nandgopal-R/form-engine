@@ -4,6 +4,7 @@ import type {
   CreateFieldContext,
   DeleteFieldContext,
   GetAllFieldsContext,
+  SwapFieldsContext,
   UpdateFieldContext,
 } from "../../types/form-fields";
 
@@ -116,7 +117,11 @@ export async function createField({
 
     if (!prevField) {
       // ❗ This will automatically rollback the transaction
-      throw new Error("Previous field not found in the specified form");
+      set.status = 400;
+      return {
+        success: false,
+        message: "Previous field not found in the specified form",
+      };
     }
 
     const nextField = await tx.formFields.findFirst({
@@ -148,7 +153,7 @@ export async function createField({
     return created;
   });
 
-  logger.info(`Created field ${createdField.id} in form ${params.formId}`);
+  logger.info(`Created field createdField in form ${params.formId}`);
 
   return {
     success: true,
@@ -237,4 +242,101 @@ export async function deleteField({ params, set, user }: DeleteFieldContext) {
 
   logger.info(`Deleted field ${params.id}`);
   return { success: true, message: "Field deleted successfully" };
+}
+
+export async function swapFields({ body, set, user }: SwapFieldsContext) {
+  const { firstFieldId, secondFieldId } = body;
+
+  // 1. Fetch both fields
+  const fields = await prisma.formFields.findMany({
+    where: { id: { in: [firstFieldId, secondFieldId] } },
+    include: { form: true },
+  });
+
+  const firstField = fields.find((f) => f.id === firstFieldId);
+  const secondField = fields.find((f) => f.id === secondFieldId);
+
+  if (!firstField || !secondField) {
+    set.status = 404;
+    return { success: false, message: "One or both fields not found" };
+  }
+
+  // 2. Authorization
+  if (
+    firstField.form.ownerId !== user.id ||
+    secondField.form.ownerId !== user.id
+  ) {
+    set.status = 403;
+    return { success: false, message: "Unauthorized" };
+  }
+
+  // 3. Same-form guard
+  if (firstField.formId !== secondField.formId) {
+    set.status = 400;
+    return { success: false, message: "Fields must belong to the same form" };
+  }
+
+  // 4. No-op guard
+  if (firstFieldId === secondFieldId) {
+    return { success: true, message: "Fields are the same, no swap needed" };
+  }
+
+  // 5. Transaction: rebuild order safely
+  await prisma.$transaction(async (tx) => {
+    // Fetch ALL fields of the form
+    const allFields = await tx.formFields.findMany({
+      where: { formId: firstField.formId },
+    });
+
+    // Reconstruct current order
+    const byPrev = new Map<string | null, (typeof allFields)[number]>();
+
+    for (const field of allFields) {
+      // if corruption exists, last one wins — still deterministic
+      byPrev.set(field.prevFieldId ?? null, field);
+    }
+
+    const ordered: typeof allFields = [];
+    let current = byPrev.get(null);
+
+    while (current) {
+      ordered.push(current);
+      current = byPrev.get(current.id);
+    }
+
+    if (ordered.length !== allFields.length) {
+      set.status = 500;
+      return {
+        success: false,
+        message: "Form fields list is corrupted",
+      };
+    }
+
+    // Swap positions
+    const i = ordered.findIndex((f) => f.id === firstFieldId);
+    const j = ordered.findIndex((f) => f.id === secondFieldId);
+
+    if (i === -1 || j === -1) {
+      set.status = 500;
+      return {
+        success: false,
+        message: "Form fields list is corrupted",
+      };
+    }
+
+    [ordered[i], ordered[j]] = [ordered[j], ordered[i]];
+
+    // Rewrite prevFieldId
+    for (let k = 0; k < ordered.length; k++) {
+      await tx.formFields.update({
+        where: { id: ordered[k].id },
+        data: {
+          prevFieldId: k === 0 ? null : ordered[k - 1].id,
+        },
+      });
+    }
+  });
+
+  logger.info(`Swapped fields ${firstFieldId} and ${secondFieldId}`);
+  return { success: true, message: "Fields swapped successfully" };
 }
