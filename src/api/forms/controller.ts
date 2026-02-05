@@ -3,7 +3,6 @@ import { logger } from "../../logger/";
 import type {
   Context,
   CreateFormContext,
-  DeleteFormContext,
   GetFormByIdContext,
   UpdateFormContext,
 } from "../../types/forms";
@@ -61,7 +60,7 @@ export async function createForm({ user, body }: CreateFormContext) {
 export async function getFormById({ user, params, set }: GetFormByIdContext) {
   const form = await prisma.form.findFirst({
     where: {
-      id: params.id,
+      id: params.formId,
       ownerId: user.id,
     },
   });
@@ -92,7 +91,7 @@ export async function updateForm({
   // as prisma.update throws if not found.
   const existing = await prisma.form.findFirst({
     where: {
-      id: params.id,
+      id: params.formId,
       ownerId: user.id,
     },
   });
@@ -107,7 +106,7 @@ export async function updateForm({
 
   const form = await prisma.form.update({
     where: {
-      id: params.id,
+      id: params.formId,
     },
     data: {
       title: body.title,
@@ -123,10 +122,10 @@ export async function updateForm({
   };
 }
 
-export async function deleteForm({ user, params, set }: DeleteFormContext) {
+export async function deleteForm({ user, params, set }: GetFormByIdContext) {
   const form = await prisma.form.deleteMany({
     where: {
-      id: params.id,
+      id: params.formId,
       ownerId: user.id,
     },
   });
@@ -134,7 +133,7 @@ export async function deleteForm({ user, params, set }: DeleteFormContext) {
   if (form.count === 0) {
     logger.warn("Attempted to delete non-existent form", {
       userId: user.id,
-      formId: params.id,
+      formId: params.formId,
     });
     set.status = 404;
     return {
@@ -143,9 +142,45 @@ export async function deleteForm({ user, params, set }: DeleteFormContext) {
     };
   }
 
-  logger.info("Deleted form for user", { userId: user.id, formId: params.id });
+  logger.info("Deleted form for user", {
+    userId: user.id,
+    formId: params.formId,
+  });
   return {
     success: true,
     message: "Form deleted successfully",
+  };
+}
+
+export async function publishForm({ user, params, set }: GetFormByIdContext) {
+  const existing = await prisma.form.findFirst({
+    where: {
+      id: params.formId,
+      ownerId: user.id,
+    },
+  });
+
+  if (!existing) {
+    set.status = 404;
+    return {
+      success: false,
+      message: "Form not found",
+    };
+  }
+
+  const form = await prisma.form.update({
+    where: {
+      id: params.formId,
+    },
+    data: {
+      isPublished: true,
+    },
+  });
+
+  logger.info("Published form for user", { userId: user.id, formId: form.id });
+  return {
+    success: true,
+    message: "Form published successfully",
+    data: form,
   };
 }

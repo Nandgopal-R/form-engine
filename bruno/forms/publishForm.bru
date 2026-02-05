@@ -1,0 +1,16 @@
+meta {
+  name: publishForm
+  type: http
+  seq: 6
+}
+
+get {
+  url: http://localhost:8000/forms
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

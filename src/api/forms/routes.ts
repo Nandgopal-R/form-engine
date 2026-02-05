@@ -1,7 +1,6 @@
 import { Elysia } from "elysia";
 import {
   createFormDTO,
-  deleteFormDTO,
   getFormByIdDTO,
   updateFormDTO,
 } from "../../types/forms";
@@ -11,6 +10,7 @@ import {
   deleteForm,
   getAllForms,
   getFormById,
+  publishForm,
   updateForm,
 } from "./controller";
 
@@ -18,6 +18,7 @@ export const formRoutes = new Elysia({ prefix: "/forms" })
   .use(requireAuth)
   .get("/", getAllForms)
   .post("/", createForm, createFormDTO)
-  .get("/:id", getFormById, getFormByIdDTO)
-  .put("/:id", updateForm, updateFormDTO)
-  .delete("/:id", deleteForm, deleteFormDTO);
+  .get("/:formId", getFormById, getFormByIdDTO)
+  .put("/:formId", updateForm, updateFormDTO)
+  .delete("/:formId", deleteForm, getFormByIdDTO)
+  .post("/publish/:formId", publishForm, getFormByIdDTO);
