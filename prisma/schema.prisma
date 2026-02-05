@@ -45,14 +45,17 @@ model Session {
 }
 
 model Account {
-  id           String    @id @default(uuid())
-  userId       String
-  accountId    String
-  providerId   String
-  accessToken  String? // <--- Needed for OAuth
-  refreshToken String? // <--- Needed for OAuth
-  expiresAt    DateTime? // <--- Needed for OAuth
-  password     String? // <--- Needed for Email/Password
+  id                   String    @id @default(uuid())
+  userId               String
+  accountId            String
+  providerId           String
+  accessToken          String?
+  refreshToken         String?
+  idToken              String?
+  scope                String?
+  accessTokenExpiresAt DateTime?
+  expiresAt            DateTime?
+  password             String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
