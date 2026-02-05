@@ -11,6 +11,7 @@ import {
   getAllForms,
   getFormById,
   publishForm,
+  unPublishForm,
   updateForm,
 } from "./controller";
 
@@ -21,4 +22,5 @@ export const formRoutes = new Elysia({ prefix: "/forms" })
   .get("/:formId", getFormById, getFormByIdDTO)
   .put("/:formId", updateForm, updateFormDTO)
   .delete("/:formId", deleteForm, getFormByIdDTO)
-  .post("/publish/:formId", publishForm, getFormByIdDTO);
+  .post("/publish/:formId", publishForm, getFormByIdDTO)
+  .post("/unpublish/:formId", unPublishForm, getFormByIdDTO);

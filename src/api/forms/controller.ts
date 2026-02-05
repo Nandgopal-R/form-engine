@@ -184,3 +184,43 @@ export async function publishForm({ user, params, set }: GetFormByIdContext) {
     data: form,
   };
 }
+
+export async function unPublishForm({ user, params, set }: GetFormByIdContext) {
+  const existing = await prisma.form.findFirst({
+    where: {
+      id: params.formId,
+      ownerId: user.id,
+    },
+  });
+
+  if (!existing) {
+    logger.warn("Attempted to unpublish non-existent form", {
+      userId: user.id,
+      formId: params.formId,
+    });
+    set.status = 404;
+    return {
+      success: false,
+      message: "Form not found",
+    };
+  }
+
+  const form = await prisma.form.update({
+    where: {
+      id: params.formId,
+    },
+    data: {
+      isPublished: false,
+    },
+  });
+
+  logger.info("Unpublished form for user", {
+    userId: user.id,
+    formId: form.id,
+  });
+  return {
+    success: true,
+    message: "Form unpublished successfully",
+    data: form,
+  };
+}
