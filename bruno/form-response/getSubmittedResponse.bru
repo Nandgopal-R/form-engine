@@ -18,3 +18,52 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  Get My Submitted Response
+  
+  Allows a respondent to view their own submission for a specific form. Like the owner endpoint, this also transforms Field IDs into readable Field Names.
+  
+      URL: /forms/:formId/my-response
+  
+      Method: GET
+  
+      Auth Required: Yes
+  
+  Path Parameters
+  Parameter	Type	Description
+  formId	string (UUID)	The ID of the form the user submitted to.
+  Responses
+  ✅ 200 OK: Success
+  
+  Returns the user's previous submission(s).
+  ```JSON
+  
+  {
+    "success": true,
+    "message": "Response retrieved successfully",
+    "data": [
+      {
+        "id": "resp_999",
+        "formId": "form_abc",
+        "formTitle": "Event Registration",
+        "answers": {
+          "Attendee Name": "Nand Gopal",
+          "Dietary Preference": "Vegetarian"
+        }
+      }
+    ]
+  }
+  ```
+  
+  ❌ 404 Not Found: No Submission Found
+  
+  Occurs if the user has not submitted this form yet.
+  ```JSON
+  
+  {
+    "success": false,
+    "message": "No response found for this form"
+  }
+  ```
+}
