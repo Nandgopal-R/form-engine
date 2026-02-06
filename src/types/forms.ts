@@ -18,7 +18,7 @@ export interface CreateFormContext extends Context {
 
 export const getFormByIdDTO = {
   params: t.Object({
-    id: t.String({
+    formId: t.String({
       format: "uuid",
     }),
   }),
@@ -30,7 +30,7 @@ export interface GetFormByIdContext extends Context {
 
 export const updateFormDTO = {
   params: t.Object({
-    id: t.String({
+    formId: t.String({
       format: "uuid",
     }),
   }),
@@ -43,16 +43,4 @@ export const updateFormDTO = {
 export interface UpdateFormContext extends Context {
   params: Static<typeof updateFormDTO.params>;
   body: Static<typeof updateFormDTO.body>;
-}
-
-export const deleteFormDTO = {
-  params: t.Object({
-    id: t.String({
-      format: "uuid",
-    }),
-  }),
-};
-
-export interface DeleteFormContext extends Context {
-  params: Static<typeof deleteFormDTO.params>;
 }

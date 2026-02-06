@@ -35,7 +35,7 @@ const app = new Elysia()
     }
 
     // D. The "Catch-All" for crashes
-    logger.error(`Server Error: ${request.method} ${request.url}`, { error });
+    logger.error(`Server Error: ${request.method} ${request.url}`, error);
 
     set.status = 500;
     return {

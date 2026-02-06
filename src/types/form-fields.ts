@@ -73,3 +73,18 @@ export const deleteFieldDTO = {
 export interface DeleteFieldContext extends Context {
   params: Static<typeof deleteFieldDTO.params>;
 }
+
+export const swapFieldsDTO = {
+  body: t.Object({
+    firstFieldId: t.String({
+      format: "uuid",
+    }),
+    secondFieldId: t.String({
+      format: "uuid",
+    }),
+  }),
+};
+
+export interface SwapFieldsContext extends Context {
+  body: Static<typeof swapFieldsDTO.body>;
+}

@@ -1,0 +1,20 @@
+meta {
+  name: publishForm
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:8000/forms/publish/:formId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  formId: 87e66348-5607-45bb-9da4-3133552f01dc
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
