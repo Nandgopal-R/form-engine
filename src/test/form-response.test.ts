@@ -1,4 +1,4 @@
-import { describe, it, expect, mock, beforeEach } from "bun:test";
+import { beforeEach, describe, expect, it, mock } from "bun:test";
 
 // ---------------- MOCK PRISMA ----------------
 
@@ -46,7 +46,6 @@ const {
 } = await import("../api/form-response/controller");
 
 describe("Form Response Controller Tests", () => {
-
   beforeEach(() => {
     formFindUniqueMock.mockReset();
     formResponseCreateMock.mockReset();
@@ -239,5 +238,4 @@ describe("Form Response Controller Tests", () => {
     expect(res.success).toBe(false);
     expect(set.status).toBe(404);
   });
-
 });
