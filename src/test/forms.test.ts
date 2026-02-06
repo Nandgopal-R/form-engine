@@ -4,6 +4,8 @@ import { describe, it, expect, mock, beforeEach } from "bun:test";
 const findManyMock = mock();
 const createMock = mock();
 const findFirstMock = mock();
+const updateMock = mock();
+const deleteManyMock = mock();
 
 mock.module("../db/prisma", () => ({
   prisma: {
@@ -11,6 +13,8 @@ mock.module("../db/prisma", () => ({
       findMany: findManyMock,
       create: createMock,
       findFirst: findFirstMock,
+      update: updateMock,
+      deleteMany: deleteManyMock,
     },
   },
 }));
@@ -28,11 +32,12 @@ mock.module("../logger", () => ({
 }));
 
 // IMPORT AFTER MOCKS
-// IMPORT AFTER MOCKS
 const {
   getAllForms,
   createForm,
   getFormById,
+  updateForm,
+  deleteForm,
 } = await import("../api/forms/controller");
 
 describe("Forms Controller Tests", () => {
@@ -41,6 +46,8 @@ describe("Forms Controller Tests", () => {
     findManyMock.mockReset();
     createMock.mockReset();
     findFirstMock.mockReset();
+    updateMock.mockReset();
+    deleteManyMock.mockReset();
     mockInfo.mockReset();
     mockWarn.mockReset();
   });
@@ -146,6 +153,104 @@ describe("Forms Controller Tests", () => {
 
     expect(
       getFormById({
+        user,
+        params: { id: "1" },
+        set,
+      } as any)
+    ).rejects.toThrow();
+  });
+
+  // ===== updateForm =====
+
+  it("updateForm → success", async () => {
+    findFirstMock.mockResolvedValue({ id: "1" });
+
+    updateMock.mockResolvedValue({
+      id: "1",
+      title: "Updated",
+    });
+
+    const set: any = {};
+
+    const res = await updateForm({
+      user,
+      params: { id: "1" },
+      body: { title: "Updated", description: "D" },
+      set,
+    } as any);
+
+    expect(res.success).toBe(true);
+  });
+
+  it("updateForm → not found", async () => {
+    findFirstMock.mockResolvedValue(null);
+
+    const set: any = {};
+
+    const res = await updateForm({
+      user,
+      params: { id: "1" },
+      body: { title: "T", description: "D" },
+      set,
+    } as any);
+
+    expect(res.success).toBe(false);
+    expect(set.status).toBe(404);
+  });
+
+  it("updateForm → DB error", async () => {
+    findFirstMock.mockRejectedValue(new Error("DB fail"));
+
+    const set: any = {};
+
+    expect(
+      updateForm({
+        user,
+        params: { id: "1" },
+        body: { title: "T", description: "D" },
+        set,
+      } as any)
+    ).rejects.toThrow();
+  });
+
+  // ===== deleteForm =====
+
+  it("deleteForm → success", async () => {
+    deleteManyMock.mockResolvedValue({ count: 1 });
+
+    const set: any = {};
+
+    const res = await deleteForm({
+      user,
+      params: { id: "1" },
+      set,
+    } as any);
+
+    expect(res.success).toBe(true);
+  });
+
+  it("deleteForm → not found", async () => {
+    deleteManyMock.mockResolvedValue({ count: 0 });
+
+    const set: any = {};
+
+    const res = await deleteForm({
+      user,
+      params: { id: "1" },
+      set,
+    } as any);
+
+    expect(res.success).toBe(false);
+    expect(set.status).toBe(404);
+  });
+
+  it("deleteForm → DB error", async () => {
+    deleteManyMock.mockRejectedValue(new Error("DB crash"));
+
+    const set: any = {};
+
+    expect(
+      deleteForm({
         user,
         params: { id: "1" },
         set,
