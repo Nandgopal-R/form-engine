@@ -1,4 +1,4 @@
-import { describe, it, expect, mock, beforeEach } from "bun:test";
+import { beforeEach, describe, expect, it, mock } from "bun:test";
 
 // ---------- MOCK PRISMA ----------
 const findManyMock = mock();
@@ -32,16 +32,10 @@ mock.module("../logger", () => ({
 }));
 
 // IMPORT AFTER MOCKS
-const {
-  getAllForms,
-  createForm,
-  getFormById,
-  updateForm,
-  deleteForm,
-} = await import("../api/forms/controller");
+const { getAllForms, createForm, getFormById, updateForm, deleteForm } =
+  await import("../api/forms/controller");
 
 describe("Forms Controller Tests", () => {
-
   beforeEach(() => {
     findManyMock.mockReset();
     createMock.mockReset();
@@ -113,7 +107,7 @@ describe("Forms Controller Tests", () => {
       createForm({
         user,
         body: { title: "X", description: "Y" },
-      } as any)
+      } as any),
     ).rejects.toThrow();
   });
 
@@ -156,7 +150,7 @@ describe("Forms Controller Tests", () => {
         user,
         params: { id: "1" },
         set,
-      } as any)
+      } as any),
     ).rejects.toThrow();
   });
 
@@ -209,7 +203,7 @@ describe("Forms Controller Tests", () => {
         params: { id: "1" },
         body: { title: "T", description: "D" },
         set,
-      } as any)
+      } as any),
     ).rejects.toThrow();
   });
 
@@ -254,8 +248,7 @@ describe("Forms Controller Tests", () => {
         user,
         params: { id: "1" },
         set,
-      } as any)
+      } as any),
     ).rejects.toThrow();
   });
-
 });
