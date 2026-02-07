@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: http://localhost:8000/responses/:formId
+  url: http://localhost:8000/responses/submit/:formId
   body: json
   auth: inherit
 }
@@ -30,72 +30,76 @@ settings {
 }
 
 docs {
-  ## Submit Response
-  Creates a new response entry for a specific form. This endpoint checks if the form exists and is published before accepting the submission.
+  # Submit Response
   
-  * **URL:** `/forms/:formId/responses`
-  * **Method:** `POST`
-  * **Auth Required:** Yes
+  ## Endpoint
+  `POST /forms/:formId/responses`
   
-  ### Path Parameters
-  | Parameter | Type | Description |
-  | :--- | :--- | :--- |
-  | `formId` | `string` (UUID) | The unique ID of the form being submitted. |
+  ## Description
+  Submits a user's final response for a form. If a draft exists, it is updated and marked as submitted. If already submitted, the request is rejected.
   
-  ### Request Body
-  | Field | Type | Description |
-  | :--- | :--- | :--- |
-  | `answers` | `object` | A JSON object where keys are **Field IDs** and values are the user's answers. |
+  ## Controller
+  `submitResponse`
   
-  **Sample Input:**
+  ## Auth Required
+  ✅ Yes (User must be logged in)
+  
+  ## Path Parameters
+  
+  | Name   | Type   | Required | Description |
+  |--------|--------|----------|-------------|
+  | formId | string | Yes      | ID of the form to submit |
+  
+  ## Request Body
+  
   ```json
   {
     "answers": {
-      "field_123_uuid": "John Doe",
-      "field_456_uuid": 25,
-      "field_789_uuid": ["Option A", "Option B"]
+      "fieldId1": "Answer 1",
+      "fieldId2": "Answer 2"
     }
   }
   
   Responses
-  ✅ 200 OK: Success
-  
-  Returns the created response object.
-  JSON
+  Success Response
+  Status: 200 OK
   
   {
     "success": true,
     "message": "Response submitted successfully",
     "data": {
-      "id": "response_abc_123",
-      "formId": "form_xyz_789",
-      "respondentId": "user_555",
+      "id": "response_123",
+      "formId": "form_456",
+      "respondentId": "user_789",
       "answers": {
-        "field_123_uuid": "John Doe",
-        "field_456_uuid": 25,
-        "field_789_uuid": ["Option A", "Option B"]
+        "fieldId1": "Answer 1",
+        "fieldId2": "Answer 2"
       },
-      "submittedAt": "2023-10-27T10:00:00.000Z"
+      "isSubmitted": true,
+      "submittedAt": "2026-02-07T10:30:00.000Z",
+      "updatedAt": "2026-02-07T10:30:00.000Z"
     }
   }
   
-  ❌ 403 Forbidden: Form Not Published
+  Error Responses
+  Status: 404 Not Found
   
-  Occurs if the form exists but isPublished is false.
-  JSON
+  {
+    "success": false,
+    "message": "Form not found"
+  }
+  
+  Status: 403 Forbidden
   
   {
     "success": false,
     "message": "Form is not published"
   }
   
-  ❌ 404 Not Found: Form Doesn't Exist
-  
-  Occurs if the formId provided is invalid.
-  JSON
+  Status: 400 Bad Request
   
   {
     "success": false,
-    "message": "Form not found"
+    "message": "You have already submitted this form"
   }
 }
