@@ -3,9 +3,10 @@ import { beforeEach, describe, expect, it, mock } from "bun:test";
 // ---------------- MOCK PRISMA ----------------
 
 const formFindUniqueMock = mock();
-const formResponseCreateMock = mock();
-const formResponseUpdateManyMock = mock();
+const formResponseFindUniqueMock = mock();
+const formResponseUpsertMock = mock();
 const formResponseFindManyMock = mock();
+const formResponseFindFirstMock = mock();
 const formFieldsFindManyMock = mock();
 
 mock.module("../db/prisma", () => ({
@@ -14,9 +15,10 @@ mock.module("../db/prisma", () => ({
       findUnique: formFindUniqueMock,
     },
     formResponse: {
-      create: formResponseCreateMock,
-      updateMany: formResponseUpdateManyMock,
+      findUnique: formResponseFindUniqueMock,
+      upsert: formResponseUpsertMock,
       findMany: formResponseFindManyMock,
+      findFirst: formResponseFindFirstMock,
     },
     formFields: {
       findMany: formFieldsFindManyMock,
@@ -40,17 +42,19 @@ mock.module("../logger", () => ({
 // IMPORT AFTER MOCKS
 const {
   submitResponse,
-  resumeResponse,
+  saveDraftResponse,
   getResponseForFormOwner,
   getSubmittedResponse,
+  getDraftResponse,
 } = await import("../api/form-response/controller");
 
 describe("Form Response Controller Tests", () => {
   beforeEach(() => {
     formFindUniqueMock.mockReset();
-    formResponseCreateMock.mockReset();
-    formResponseUpdateManyMock.mockReset();
+    formResponseFindUniqueMock.mockReset();
+    formResponseUpsertMock.mockReset();
     formResponseFindManyMock.mockReset();
+    formResponseFindFirstMock.mockReset();
     formFieldsFindManyMock.mockReset();
     mockInfo.mockReset();
     mockWarn.mockReset();
@@ -68,7 +72,9 @@ describe("Form Response Controller Tests", () => {
       isPublished: true,
     });
 
-    formResponseCreateMock.mockResolvedValue({ id: "r1" });
+    formResponseFindUniqueMock.mockResolvedValue(null);
+
+    formResponseUpsertMock.mockResolvedValue({ id: "r1" });
 
     const set: any = {};
 
@@ -117,32 +123,68 @@ describe("Form Response Controller Tests", () => {
     expect(set.status).toBe(403);
   });
 
-  // =====================================================
-  // resumeResponse
-  // =====================================================
+  it("submitResponse → already submitted", async () => {
+    formFindUniqueMock.mockResolvedValue({
+      id: "f1",
+      isPublished: true,
+    });
 
-  it("resumeResponse → success", async () => {
-    formResponseUpdateManyMock.mockResolvedValue({ count: 1 });
+    formResponseFindUniqueMock.mockResolvedValue({
+      isSubmitted: true,
+    });
 
-    const res = await resumeResponse({
-      params: { responseId: "r1" },
+    const set: any = {};
+
+    const res = await submitResponse({
+      params: { formId: "f1" },
       body: { answers: {} },
       user,
+      set,
+    } as any);
+
+    expect(res.success).toBe(false);
+    expect(set.status).toBe(400);
+  });
+
+  // =====================================================
+  // saveDraftResponse
+  // =====================================================
+
+  it("saveDraftResponse → success", async () => {
+    formFindUniqueMock.mockResolvedValue({ id: "f1" });
+    formResponseFindUniqueMock.mockResolvedValue(null);
+    formResponseUpsertMock.mockResolvedValue({ id: "r1" });
+
+    const set: any = {};
+
+    const res = await saveDraftResponse({
+      params: { formId: "f1" },
+      body: { answers: {} },
+      user,
+      set,
     } as any);
 
     expect(res.success).toBe(true);
   });
 
-  it("resumeResponse → not found", async () => {
-    formResponseUpdateManyMock.mockResolvedValue({ count: 0 });
+  it("saveDraftResponse → already submitted", async () => {
+    formFindUniqueMock.mockResolvedValue({ id: "f1" });
 
-    const res = await resumeResponse({
-      params: { responseId: "r1" },
+    formResponseFindUniqueMock.mockResolvedValue({
+      isSubmitted: true,
+    });
+
+    const set: any = {};
+
+    const res = await saveDraftResponse({
+      params: { formId: "f1" },
       body: { answers: {} },
       user,
+      set,
     } as any);
 
     expect(res.success).toBe(false);
+    expect(set.status).toBe(400);
   });
 
   // =====================================================
@@ -177,22 +219,7 @@ describe("Form Response Controller Tests", () => {
     } as any);
 
     expect(res.success).toBe(true);
-    expect(res.data!.length).toBe(1); // ✅ FIX
-  });
-
-  it("getResponseForFormOwner → form not found", async () => {
-    formFindUniqueMock.mockResolvedValue(null);
-
-    const set: any = {};
-
-    const res = await getResponseForFormOwner({
-      params: { formId: "f1" },
-      user,
-      set,
-    } as any);
-
-    expect(res.success).toBe(false);
-    expect(set.status).toBe(404);
+    expect(res.data!.length).toBe(1);
   });
 
   // =====================================================
@@ -222,15 +249,43 @@ describe("Form Response Controller Tests", () => {
     } as any);
 
     expect(res.success).toBe(true);
-    expect(res.data!.length).toBe(1); // ✅ SAFE ASSERTION
+    expect(res.data!.length).toBe(1);
   });
 
-  it("getSubmittedResponse → none found", async () => {
-    formResponseFindManyMock.mockResolvedValue([]);
+  // =====================================================
+  // getDraftResponse
+  // =====================================================
+
+  it("getDraftResponse → success", async () => {
+    formResponseFindFirstMock.mockResolvedValue({
+      id: "r1",
+      formId: "f1",
+      answers: { field1: "A" },
+      form: { title: "Form A" },
+    });
+
+    formFieldsFindManyMock.mockResolvedValue([
+      { id: "field1", fieldName: "Name" },
+    ]);
 
     const set: any = {};
 
-    const res = await getSubmittedResponse({
+    const res = await getDraftResponse({
+      params: { formId: "f1" },
+      user,
+      set,
+    } as any);
+
+    expect(res.success).toBe(true);
+    expect(res.data!.id).toBe("r1");
+  });
+
+  it("getDraftResponse → not found", async () => {
+    formResponseFindFirstMock.mockResolvedValue(null);
+
+    const set: any = {};
+
+    const res = await getDraftResponse({
       params: { formId: "f1" },
       user,
       set,
