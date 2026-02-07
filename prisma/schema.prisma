@@ -133,6 +133,7 @@ model FormResponse {
   submittedAt DateTime?
   updatedAt   DateTime  @updatedAt
 
+  @@unique([formId, respondentId])
   @@index([formId])
   @@map("form_response")
 }
