@@ -41,6 +41,8 @@ export async function submitResponse({
     data: {
       formId: params.formId,
       respondentId: user.id,
+      submittedAt: new Date(),
+      isSubmitted: true,
       answers: body.answers,
     },
   });
@@ -50,6 +52,43 @@ export async function submitResponse({
   return {
     success: true,
     message: "Response submitted successfully",
+    data: response,
+  };
+}
+
+export async function submitDraftResponse({
+  params,
+  body,
+  user,
+  set,
+}: FormResponseContext) {
+  const form = await prisma.form.findUnique({
+    where: {
+      id: params.formId,
+    },
+  });
+
+  if (!form) {
+    logger.warn(`Form with ID ${params.formId} not found`);
+    set.status = 404;
+    return {
+      success: false,
+      message: "Form not found",
+    };
+  }
+
+  const response = await prisma.formResponse.create({
+    data: {
+      formId: params.formId,
+      respondentId: user.id,
+      answers: body.answers,
+    },
+  });
+
+  logger.info(`User ${user.id} saved draft response for form ${params.formId}`);
+  return {
+    success: true,
+    message: "Draft response saved successfully",
     data: response,
   };
 }

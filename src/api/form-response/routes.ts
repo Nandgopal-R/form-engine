@@ -10,12 +10,14 @@ import {
   getResponseForFormOwner,
   getSubmittedResponse,
   resumeResponse,
+  submitDraftResponse,
   submitResponse,
 } from "./controller";
 
 export const formResponseRoutes = new Elysia({ prefix: "/responses" })
   .use(requireAuth)
-  .post("/:formId", submitResponse, formResponseDTO)
+  .post("/submit/:formId", submitResponse, formResponseDTO)
+  .post("/draft/:formId", submitDraftResponse, formResponseDTO)
   .put("/resume/:responseId", resumeResponse, resumeResponseDTO)
   .get("/:formId", getResponseForFormOwner, formResponseForFormOwnerDTO)
   .get("/user/:formId", getSubmittedResponse, getSubmittedResponseDTO);
