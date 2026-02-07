@@ -177,7 +177,7 @@ describe("Form Response Controller Tests", () => {
     } as any);
 
     expect(res.success).toBe(true);
-    expect(res.data.length).toBe(1);
+    expect(res.data!.length).toBe(1); // ✅ FIX
   });
 
   it("getResponseForFormOwner → form not found", async () => {
@@ -222,6 +222,7 @@ describe("Form Response Controller Tests", () => {
     } as any);
 
     expect(res.success).toBe(true);
+    expect(res.data!.length).toBe(1); // ✅ SAFE ASSERTION
   });
 
   it("getSubmittedResponse → none found", async () => {
