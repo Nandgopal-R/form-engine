@@ -18,3 +18,47 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  # 7. Unpublish Form
+  
+  Reverts the status of a form to **Unpublished**. This hides the form from the public, preventing any new submissions until it is published again.
+  
+  * **URL:** `/forms/:formId/unpublish`
+  * **Method:** `PATCH`
+  * **Auth Required:** Yes
+  
+  ### Path Parameters
+  
+  | Parameter | Type | Description |
+  | :--- | :--- | :--- |
+  | `formId` | `string` (UUID) | The unique ID of the form to unpublish. |
+  
+  ### Responses
+  
+  #### ✅ 200 OK: Unpublished
+  
+  Returns the updated form object with `isPublished` set to `false`.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Form unpublished successfully",
+    "data": {
+      "id": "form_uuid_123",
+      "title": "Customer Feedback",
+      "isPublished": false,
+      "updatedAt": "2023-10-27T16:00:00.000Z"
+    }
+  }
+  
+  ❌ 404 Not Found
+  
+  Occurs if the formId does not exist OR if the form belongs to a different user.
+  JSON
+  
+  {
+    "success": false,
+    "message": "Form not found"
+  }
+}

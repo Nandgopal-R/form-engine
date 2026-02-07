@@ -18,3 +18,41 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  # 5. Delete Form
+  
+  Permanently removes a specific form. This endpoint ensures security by only allowing the **owner** of the form to delete it. If the form does not exist or belongs to another user, no action is taken, and a 404 error is returned.
+  
+  * **URL:** `/forms/:formId`
+  * **Method:** `DELETE`
+  * **Auth Required:** Yes
+  
+  ### Path Parameters
+  
+  | Parameter | Type | Description |
+  | :--- | :--- | :--- |
+  | `formId` | `string` (UUID) | The unique ID of the form to delete. |
+  
+  ### Responses
+  
+  #### ✅ 200 OK: Deleted
+  
+  Returns a success message confirming the deletion.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Form deleted successfully"
+  }
+  
+  ❌ 404 Not Found
+  
+  Occurs if the formId does not exist OR if the form belongs to a different user.
+  JSON
+  
+  {
+    "success": false,
+    "message": "Form not found"
+  }
+}

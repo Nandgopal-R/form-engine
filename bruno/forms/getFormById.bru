@@ -18,3 +18,50 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  # 3. Get Form By ID
+  
+  Retrieves the details of a specific form. This endpoint is scoped to the **owner**, meaning a user can only fetch forms they created. If a form exists but belongs to another user, it will return a 404 error.
+  
+  * **URL:** `/forms/:formId`
+  * **Method:** `GET`
+  * **Auth Required:** Yes
+  
+  ### Path Parameters
+  
+  | Parameter | Type | Description |
+  | :--- | :--- | :--- |
+  | `formId` | `string` (UUID) | The unique ID of the form to retrieve. |
+  
+  ### Responses
+  
+  #### ✅ 200 OK: Success
+  
+  Returns the full form object.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Form fetched successfully",
+    "data": {
+      "id": "form_uuid_123",
+      "title": "Customer Feedback Survey",
+      "description": "A survey to collect customer opinions.",
+      "isPublished": true,
+      "ownerId": "user_uuid_555",
+      "createdAt": "2023-10-27T10:00:00.000Z",
+      "updatedAt": "2023-10-27T12:00:00.000Z"
+    }
+  }
+  
+  ❌ 404 Not Found
+  
+  Occurs if the formId does not exist OR if the form belongs to a different user.
+  JSON
+  
+  {
+    "success": false,
+    "message": "Form not found"
+  }
+}

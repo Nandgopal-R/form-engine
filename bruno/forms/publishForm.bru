@@ -18,3 +18,47 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  # 6. Publish Form
+  
+  Changes the status of a form to **Published**. Once published, the form becomes accessible to respondents for submission.
+  
+  * **URL:** `/forms/:formId/publish`
+  * **Method:** `PATCH`
+  * **Auth Required:** Yes
+  
+  ### Path Parameters
+  
+  | Parameter | Type | Description |
+  | :--- | :--- | :--- |
+  | `formId` | `string` (UUID) | The unique ID of the form to publish. |
+  
+  ### Responses
+  
+  #### ✅ 200 OK: Published
+  
+  Returns the updated form object with `isPublished` set to `true`.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Form published successfully",
+    "data": {
+      "id": "form_uuid_123",
+      "title": "Customer Feedback",
+      "isPublished": true,
+      "updatedAt": "2023-10-27T15:00:00.000Z"
+    }
+  }
+  
+  ❌ 404 Not Found
+  
+  Occurs if the formId does not exist OR if the form belongs to a different user.
+  JSON
+  
+  {
+    "success": false,
+    "message": "Form not found"
+  }
+}

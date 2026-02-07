@@ -21,3 +21,48 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  # 2. Create Form
+  
+  Creates a new empty form container.
+  
+  * **URL:** `/forms`
+  * **Method:** `POST`
+  * **Auth Required:** Yes
+  
+  ### Request Body
+  
+  | Field | Type | Required | Description |
+  | :--- | :--- | :--- | :--- |
+  | `title` | `string` | Yes | The display title of the form. |
+  | `description` | `string` | No | A short description or instructions for the form. |
+  
+  **Sample Input:**
+  
+  ```json
+  {
+    "title": "Hackathon Registration",
+    "description": "Please fill out your team details."
+  }
+  
+  Responses
+  ✅ 200 OK: Created
+  
+  Returns the newly created form object.
+  JSON
+  
+  {
+    "success": true,
+    "message": "Form created successfully",
+    "data": {
+      "id": "form_uuid_789",
+      "title": "Hackathon Registration",
+      "description": "Please fill out your team details.",
+      "ownerId": "user_123",
+      "isPublished": false,
+      "createdAt": "2023-10-27T12:00:00.000Z",
+      "updatedAt": "2023-10-27T12:00:00.000Z"
+    }
+  }
+}

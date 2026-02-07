@@ -14,3 +14,50 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  # 1. Get All Forms
+  
+  Retrieves a list of all forms created by the currently authenticated user. This endpoint provides a summary view, returning key metadata like the title and publication status, but not the detailed form fields.
+  
+  * **URL:** `/forms`
+  * **Method:** `GET`
+  * **Auth Required:** Yes
+  
+  ### Responses
+  
+  #### ✅ 200 OK: Success
+  
+  Returns an array of form objects belonging to the user.
+  
+  ```json
+  {
+    "success": true,
+    "message": "All forms fetched successfully",
+    "data": [
+      {
+        "id": "form_uuid_123",
+        "title": "Customer Feedback Survey",
+        "isPublished": true,
+        "createdAt": "2023-10-27T10:00:00.000Z"
+      },
+      {
+        "id": "form_uuid_456",
+        "title": "Employee Registration",
+        "isPublished": false,
+        "createdAt": "2023-10-28T14:30:00.000Z"
+      }
+    ]
+  }
+  
+  ✅ 200 OK: No Forms Found
+  
+  Occurs if the user has not created any forms yet.
+  JSON
+  
+  {
+    "success": true,
+    "message": "No forms found",
+    "data": []
+  }
+}
