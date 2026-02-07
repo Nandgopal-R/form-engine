@@ -18,3 +18,73 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  ## Get Responses (For Form Owner)
+  
+  Retrieves all submissions for a specific form. This endpoint is restricted to the creator/owner of the form. It automatically transforms the raw answers JSON, replacing opaque Field IDs with readable Field Names (e.g., changing "uuid-123" to "Email").
+  
+      URL: /forms/:formId/responses
+  
+      Method: GET
+  
+      Auth Required: Yes (Must be Owner)
+  
+  Path Parameters
+  Parameter	Type	Description
+  formId	string (UUID)	The unique ID of the form.
+  Responses
+  ✅ 200 OK: Success
+  
+  Returns an array of responses with human-readable keys in answers.
+  ``` json
+  
+  {
+    "success": true,
+    "message": "Responses retrieved successfully",
+    "data": [
+      {
+        "id": "resp_001",
+        "formId": "form_xyz",
+        "formTitle": "Customer Feedback",
+        "answers": {
+          "Full Name": "Alice Smith",
+          "Rating": 5,
+          "Comments": "Great service!"
+        }
+      },
+      {
+        "id": "resp_002",
+        "formId": "form_xyz",
+        "formTitle": "Customer Feedback",
+        "answers": {
+          "Full Name": "Bob Jones",
+          "Rating": 3,
+          "Comments": "It was okay."
+        }
+      }
+    ]
+  }
+  ```
+  
+  ⚠️ 200 OK (Empty): No Responses Yet
+  
+  Occurs if the form exists and you own it, but nobody has submitted it yet.
+  ```json
+  
+  {
+    "success": false,
+    "message": "No responses found for this form"
+  }
+  ```
+  ❌ 404 Not Found: Access Denied
+  
+  Occurs if the form does not exist OR if the current user is not the owner of the form.
+  ```json
+  
+  {
+    "success": false,
+    "message": "Form not found or access denied"
+  }
+  ```
+}

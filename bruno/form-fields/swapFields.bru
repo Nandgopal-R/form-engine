@@ -12,4 +12,91 @@ post {
 
 settings {
   encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Swap Fields
+  
+  Reorders fields by swapping the positions of two specific fields. This operation is **transactional** and safe; it reconstructs the entire linked list of the form to ensure the order is preserved correctly without breaking the chain.
+  
+  * **URL:** `/fields/swap`
+  * **Method:** `POST`
+  * **Auth Required:** Yes
+  
+  ### Request Body
+  
+  | Field | Type | Required | Description |
+  | :--- | :--- | :--- | :--- |
+  | `firstFieldId` | `string` (UUID) | Yes | The ID of the first field to be swapped. |
+  | `secondFieldId` | `string` (UUID) | Yes | The ID of the second field to be swapped. |
+  
+  **Sample Input:**
+  
+  ```json
+  {
+    "firstFieldId": "field_uuid_111",
+    "secondFieldId": "field_uuid_222"
+  }
+  
+  Responses
+  ✅ 200 OK: Swapped
+  
+  Returns a success message confirming the fields have been reordered.
+  JSON
+  
+  {
+    "success": true,
+    "message": "Fields swapped successfully"
+  }
+  
+  ✅ 200 OK: No-Op
+  
+  Occurs if you send the same ID for both fields. The server returns success immediately without performing database operations.
+  JSON
+  
+  {
+    "success": true,
+    "message": "Fields are the same, no swap needed"
+  }
+  
+  ❌ 400 Bad Request: Logic Error
+  
+  Occurs if the two fields belong to different forms. You can only swap fields within the same form.
+  JSON
+  
+  {
+    "success": false,
+    "message": "Fields must belong to the same form"
+  }
+  
+  ❌ 403 Forbidden: Unauthorized
+  
+  Occurs if the user attempts to swap fields on a form they do not own.
+  JSON
+  
+  {
+    "success": false,
+    "message": "Unauthorized"
+  }
+  
+  ❌ 404 Not Found
+  
+  Occurs if one or both of the provided Field IDs do not exist.
+  JSON
+  
+  {
+    "success": false,
+    "message": "One or both fields not found"
+  }
+  
+  ❌ 500 Internal Server Error: Data Corruption
+  
+  Occurs if the linked list structure in the database is broken (e.g., missing links or loops) and the server cannot safely reconstruct the order.
+  JSON
+  
+  {
+    "success": false,
+    "message": "Form fields list is corrupted"
+  }
 }

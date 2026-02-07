@@ -18,3 +18,51 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  # Delete Field
+  
+  Removes a field from the form. This endpoint automatically "heals" the linked list structure by connecting the deleted field's *previous* field directly to its *next* field, ensuring no break in the form flow.
+  
+  * **URL:** `/fields/:id`
+  * **Method:** `DELETE`
+  * **Auth Required:** Yes
+  
+  ### Path Parameters
+  
+  | Parameter | Type | Description |
+  | :--- | :--- | :--- |
+  | `id` | `string` (UUID) | The unique ID of the field to delete. |
+  
+  ### Responses
+  
+  #### ✅ 200 OK: Deleted
+  
+  Returns a success message confirming the deletion and re-linking.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Field deleted successfully"
+  }
+  
+  ❌ 403 Forbidden: Unauthorized
+  
+  Occurs if the user attempts to delete a field from a form they do not own.
+  JSON
+  
+  {
+    "success": false,
+    "message": "Unauthorized"
+  }
+  
+  ❌ 404 Not Found
+  
+  Occurs if the field id provided does not exist.
+  JSON
+  
+  {
+    "success": false,
+    "message": "Field not found"
+  }
+}

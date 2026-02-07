@@ -28,3 +28,74 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  ## Submit Response
+  Creates a new response entry for a specific form. This endpoint checks if the form exists and is published before accepting the submission.
+  
+  * **URL:** `/forms/:formId/responses`
+  * **Method:** `POST`
+  * **Auth Required:** Yes
+  
+  ### Path Parameters
+  | Parameter | Type | Description |
+  | :--- | :--- | :--- |
+  | `formId` | `string` (UUID) | The unique ID of the form being submitted. |
+  
+  ### Request Body
+  | Field | Type | Description |
+  | :--- | :--- | :--- |
+  | `answers` | `object` | A JSON object where keys are **Field IDs** and values are the user's answers. |
+  
+  **Sample Input:**
+  ```json
+  {
+    "answers": {
+      "field_123_uuid": "John Doe",
+      "field_456_uuid": 25,
+      "field_789_uuid": ["Option A", "Option B"]
+    }
+  }
+  
+  Responses
+  ✅ 200 OK: Success
+  
+  Returns the created response object.
+  JSON
+  
+  {
+    "success": true,
+    "message": "Response submitted successfully",
+    "data": {
+      "id": "response_abc_123",
+      "formId": "form_xyz_789",
+      "respondentId": "user_555",
+      "answers": {
+        "field_123_uuid": "John Doe",
+        "field_456_uuid": 25,
+        "field_789_uuid": ["Option A", "Option B"]
+      },
+      "submittedAt": "2023-10-27T10:00:00.000Z"
+    }
+  }
+  
+  ❌ 403 Forbidden: Form Not Published
+  
+  Occurs if the form exists but isPublished is false.
+  JSON
+  
+  {
+    "success": false,
+    "message": "Form is not published"
+  }
+  
+  ❌ 404 Not Found: Form Doesn't Exist
+  
+  Occurs if the formId provided is invalid.
+  JSON
+  
+  {
+    "success": false,
+    "message": "Form not found"
+  }
+}

@@ -26,3 +26,86 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  # Update Field
+  
+  Modifies the properties of an existing form field (e.g., changing the label, validation rules, or internal name).
+  
+  **Note:** This endpoint updates the *content* of the field. It does **not** change the position/order of the field within the form.
+  
+  * **URL:** `/fields/:id`
+  * **Method:** `PATCH`
+  * **Auth Required:** Yes
+  
+  ### Path Parameters
+  
+  | Parameter | Type | Description |
+  | :--- | :--- | :--- |
+  | `id` | `string` (UUID) | The unique ID of the specific field to update. |
+  
+  ### Request Body
+  
+  | Field | Type | Required | Description |
+  | :--- | :--- | :--- | :--- |
+  | `fieldName` | `string` | No | Internal unique name for the field. |
+  | `label` | `string` | No | The question text shown to users. |
+  | `fieldValueType` | `string` | No | Data type (e.g., "string", "number"). |
+  | `fieldType` | `string` | No | UI Component type (e.g., "text", "select"). |
+  | `validation` | `object` | No | JSON object for validation rules (e.g., `{ "required": true }`). |
+  
+  **Sample Input:**
+  
+  ```json
+  {
+    "label": "Please enter your official work email",
+    "validation": {
+      "required": true,
+      "pattern": "^.+@company\\.com$"
+    }
+  }
+  
+  Responses
+  ✅ 200 OK: Updated
+  
+  Returns the updated field object.
+  JSON
+  
+  {
+    "success": true,
+    "message": "Field updated successfully",
+    "data": {
+      "id": "field_uuid_123",
+      "fieldName": "email",
+      "label": "Please enter your official work email",
+      "fieldValueType": "string",
+      "fieldType": "email",
+      "validation": {
+        "required": true,
+        "pattern": "^.+@company\\.com$"
+      },
+      "formId": "form_xyz",
+      "updatedAt": "2023-10-27T12:00:00.000Z"
+    }
+  }
+  
+  ❌ 403 Forbidden: Unauthorized
+  
+  Occurs if the user attempts to update a field belonging to a form they do not own.
+  JSON
+  
+  {
+    "success": false,
+    "message": "Unauthorized"
+  }
+  
+  ❌ 404 Not Found
+  
+  Occurs if the id provided does not exist in the database.
+  JSON
+  
+  {
+    "success": false,
+    "message": "Field not found"
+  }
+}

@@ -18,3 +18,70 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  ## Get All Fields
+  Retrieves all fields associated with a specific form. The response returns the fields in the correct order (linked-list order) based on the visual flow of the form.
+  
+  * **URL:** `/forms/:formId/fields`
+  * **Method:** `GET`
+  * **Auth Required:** Yes
+  
+  ### Path Parameters
+  | Parameter | Type | Description |
+  | :--- | :--- | :--- |
+  | `formId` | `string` (UUID) | The unique ID of the form. |
+  
+  ### Responses
+  
+  #### ✅ 200 OK: Success
+  Returns the ordered list of fields.
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "id": "field_1",
+        "fieldName": "full_name",
+        "label": "Full Name",
+        "fieldValueType": "string",
+        "fieldType": "text",
+        "prevFieldId": null,
+        "formId": "form_123"
+      },
+      {
+        "id": "field_2",
+        "fieldName": "age",
+        "label": "Age",
+        "fieldValueType": "number",
+        "fieldType": "number",
+        "prevFieldId": "field_1",
+        "formId": "form_123"
+      }
+    ]
+  }
+  
+  ✅ 200 OK: No Fields Found
+  
+  Occurs if the form exists but has no fields yet.
+  ```JSON
+  
+  {
+    "success": true,
+    "message": "No forms fields found",
+    "data": []
+  }
+  ```
+  
+  ❌ 404 Not Found: Form Missing
+  
+  Occurs if the formId does not exist in the database.
+  ```JSON
+  
+  {
+    "success": false,
+    "message": "Form not found",
+    "data": []
+  }
+  ```
+}

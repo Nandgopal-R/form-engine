@@ -24,3 +24,62 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  # Update Form
+  
+  Modifies the details of an existing form, such as its title and description.
+  
+  * **URL:** `/forms/:formId`
+  * **Method:** `PATCH`
+  * **Auth Required:** Yes
+  
+  ### Path Parameters
+  
+  | Parameter | Type | Description |
+  | :--- | :--- | :--- |
+  | `formId` | `string` (UUID) | The unique ID of the form to update. |
+  
+  ### Request Body
+  
+  | Field | Type | Required | Description |
+  | :--- | :--- | :--- | :--- |
+  | `title` | `string` | No | The new title of the form. |
+  | `description` | `string` | No | The new description or instructions. |
+  
+  **Sample Input:**
+  
+  ```json
+  {
+    "title": "Updated Survey Title",
+    "description": "This is the new description."
+  }
+  
+  Responses
+  ✅ 200 OK: Updated
+  
+  Returns the updated form object.
+  JSON
+  
+  {
+    "success": true,
+    "message": "Form updated successfully",
+    "data": {
+      "id": "form_uuid_123",
+      "title": "Updated Survey Title",
+      "description": "This is the new description.",
+      "ownerId": "user_uuid_555",
+      "updatedAt": "2023-10-27T14:00:00.000Z"
+    }
+  }
+  
+  ❌ 404 Not Found
+  
+  Occurs if the formId does not exist OR if the form belongs to a different user.
+  JSON
+  
+  {
+    "success": false,
+    "message": "Form not found"
+  }
+}
