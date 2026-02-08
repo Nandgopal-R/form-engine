@@ -23,16 +23,6 @@ export async function getAllFields({ params, set }: GetAllFieldsContext) {
   }
 
   const fields = await prisma.formFields.findMany({
-    select: {
-      id: true,
-      fieldName: true,
-      label: true,
-      fieldValueType: true,
-      fieldType: true,
-      validation: true,
-      prevFieldId: true,
-      nextField: true,
-    },
     where: { formId: params.formId },
   });
 
@@ -44,14 +34,22 @@ export async function getAllFields({ params, set }: GetAllFieldsContext) {
       data: [],
     };
   }
-  logger.info(
-    `Fetched all fields for formId: ${params.formId}, fieldCount: ${fields.length}`,
+
+  const ordered: typeof fields = [];
+
+  let current = fields.find(
+    (f): f is (typeof fields)[number] => f.prevFieldId === null,
   );
-  return {
-    success: true,
-    message: "All form fields fetched successfully",
-    data: fields,
-  };
+
+  while (current) {
+    ordered.push(current);
+
+    current = fields.find(
+      (f): f is (typeof fields)[number] => f.prevFieldId === current!.id,
+    );
+  }
+
+  return { success: true, data: ordered };
 }
 
 export async function createField({
@@ -69,62 +67,66 @@ export async function createField({
 
   if (!form) {
     set.status = 404;
-    return {
-      success: false,
-      message: "Form not found",
-    };
+    return { success: false, message: "Form not found" };
   }
 
-  const field = await prisma.$transaction(async (tx: any) => {
-    // 1. If we are inserting after a specific field (prevFieldId provided)
-    if (body.prevFieldId) {
-      // Fetch the previous field to see if it has a next field
-      const prevField = await tx.formFields.findUnique({
-        where: { id: body.prevFieldId },
+  const createdField = await prisma.$transaction(async (tx) => {
+    /**
+     * INSERT AT HEAD
+     */
+    if (!body.prevFieldId) {
+      const currentHead = await tx.formFields.findFirst({
+        where: {
+          formId: params.formId,
+          prevFieldId: null,
+        },
       });
 
-      if (!prevField) {
-        throw new Error("Previous field not found");
-      }
-
-      // 2. Create the new field
-      // It points back to prevFieldId
-      // It points forward to whatever prevField was pointing to
-      const newField = await tx.formFields.create({
+      const created = await tx.formFields.create({
         data: {
           fieldName: body.fieldName,
           label: body.label,
           fieldValueType: body.fieldValueType,
           fieldType: body.fieldType,
           validation: body.validation ?? undefined,
-          prevFieldId: body.prevFieldId,
-          nextField: prevField.nextField, // Inherit the link
           formId: params.formId,
+          prevFieldId: null,
         },
       });
 
-      // 3. Update the previous field to point to the new field
-      await tx.formFields.update({
-        where: { id: body.prevFieldId },
-        data: { nextField: newField.id },
-      });
-
-      // 4. If there was a next field, update it to point back to the new field
-      if (prevField.nextField) {
-        // We can't query by `id` directly if `nextField` is just a string without relation,
-        // but typically we can update the row where id matches the string.
+      if (currentHead) {
         await tx.formFields.update({
-          where: { id: prevField.nextField },
-          data: { prevFieldId: newField.id },
+          where: { id: currentHead.id },
+          data: { prevFieldId: created.id },
         });
       }
 
-      return newField;
+      return created;
     }
 
-    // Fallback: If no prevFieldId is provided, we assume it's the first field
-    // or simply creating a field without links yet.
-    return await tx.formFields.create({
+    /**
+     * INSERT AFTER A FIELD
+     */
+    const prevField = await tx.formFields.findFirst({
+      where: {
+        id: body.prevFieldId,
+        formId: params.formId,
+      },
+    });
+
+    if (!prevField) {
+      // ❗ This will automatically rollback the transaction
+      throw new Error("Previous field not found in the specified form");
+    }
+
+    const nextField = await tx.formFields.findFirst({
+      where: {
+        formId: params.formId,
+        prevFieldId: prevField.id,
+      },
+    });
+
+    const created = await tx.formFields.create({
       data: {
         fieldName: body.fieldName,
         label: body.label,
@@ -132,16 +134,26 @@ export async function createField({
         fieldType: body.fieldType,
         validation: body.validation ?? undefined,
         formId: params.formId,
+        prevFieldId: prevField.id,
       },
     });
+
+    if (nextField) {
+      await tx.formFields.update({
+        where: { id: nextField.id },
+        data: { prevFieldId: created.id },
+      });
+    }
+
+    return created;
   });
 
-  logger.info(`Created field ${field.id} for form ${params.formId}`);
+  logger.info(`Created field ${createdField.id} in form ${params.formId}`);
 
   return {
     success: true,
     message: "Field created successfully",
-    data: field,
+    data: createdField,
   };
 }
 
@@ -202,26 +214,24 @@ export async function deleteField({ params, set, user }: DeleteFieldContext) {
     return { success: false, message: "Unauthorized" };
   }
 
-  await prisma.$transaction(async (tx: any) => {
-    // 1. Link Previous to Next
-    if (field.prevFieldId) {
-      await tx.formFields.update({
-        where: { id: field.prevFieldId },
-        data: { nextField: field.nextField },
-      });
-    }
+  await prisma.$transaction(async (tx) => {
+    const nextField = await tx.formFields.findFirst({
+      where: {
+        formId: field.formId,
+        prevFieldId: field.id,
+      },
+    });
 
-    // 2. Link Next to Previous
-    if (field.nextField) {
+    // relink previous → next
+    if (nextField) {
       await tx.formFields.update({
-        where: { id: field.nextField },
+        where: { id: nextField.id },
         data: { prevFieldId: field.prevFieldId },
       });
     }
 
-    // 3. Delete the field
     await tx.formFields.delete({
-      where: { id: params.id },
+      where: { id: field.id },
     });
   });
 

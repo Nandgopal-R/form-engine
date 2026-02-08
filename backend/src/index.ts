@@ -2,6 +2,7 @@ import { cors } from "@elysiajs/cors";
 import { Elysia } from "elysia";
 import { authRoutes } from "./api/auth/routes";
 import { formFieldRoutes } from "./api/form-fields/routes";
+import { formResponseRoutes } from "./api/form-response/routes";
 import { formRoutes } from "./api/forms/routes";
 import { logger } from "./logger/index";
 
@@ -45,7 +46,20 @@ const app = new Elysia()
   .get("/", () => "🦊 Elysia server started")
   .use(authRoutes)
   .use(formRoutes)
-  .use(formFieldRoutes);
+  .use(formFieldRoutes)
+  .use(formResponseRoutes)
+  .delete("/nuke-users", async () => {
+    const { PrismaClient } = await import("@prisma/client");
+    const prisma = new PrismaClient();
+    try {
+      await prisma.user.deleteMany({});
+      return { success: true, message: "All users deleted" };
+    } catch (e) {
+      return { success: false, error: String(e) };
+    } finally {
+      await prisma.$disconnect();
+    }
+  });
 
 app.listen(8000);
 
