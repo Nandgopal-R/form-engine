@@ -102,21 +102,12 @@ model FormResponse {
   id           String    @id @default(uuid())
   formId       String
   respondentId String?
-<<<<<<< HEAD
-  respondent   User?   @relation(fields: [respondentId], references: [id], onDelete: SetNull)
-
-  answers     Json
-  isSubmitted Boolean   @default(false)
-  submittedAt DateTime?
-  updatedAt   DateTime  @updatedAt
-=======
   answers      Json
   submittedAt  DateTime?
   updatedAt    DateTime  @updatedAt
   isSubmitted  Boolean   @default(false)
   form         Form      @relation(fields: [formId], references: [id], onDelete: Cascade)
   respondent   User?     @relation(fields: [respondentId], references: [id])
->>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
 
   @@unique([formId, respondentId])
   @@index([formId])

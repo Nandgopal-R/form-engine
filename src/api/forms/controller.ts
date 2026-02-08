@@ -80,6 +80,13 @@ export async function getFormById({ user, params, set }: GetFormByIdContext) {
       id: params.formId,
       ownerId: user.id,
     },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      isPublished: true,
+      createdAt: true,
+    },
   });
 
   if (!form) {
@@ -90,8 +97,6 @@ export async function getFormById({ user, params, set }: GetFormByIdContext) {
     };
   }
 
-<<<<<<< HEAD
-=======
   const fields = await prisma.formFields.findMany({
     where: { formId: params.formId },
   });
@@ -119,16 +124,11 @@ export async function getFormById({ user, params, set }: GetFormByIdContext) {
     );
   }
 
->>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
   logger.info("Fetched form for user", { userId: user.id, formId: form.id });
   return {
     success: true,
     message: "Form fetched successfully",
-<<<<<<< HEAD
-    data: form,
-=======
     data: { ...form, fields: ordered },
->>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
   };
 }
 

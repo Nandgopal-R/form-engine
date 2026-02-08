@@ -4,6 +4,7 @@ import type {
   FormResponseContext,
   FormResponseForFormOwnerContext,
   GetSubmittedResponseContext,
+  ResumeResponseContext,
 } from "../../types/form-response";
 
 export async function submitResponse({
@@ -36,45 +37,12 @@ export async function submitResponse({
     };
   }
 
-  const existing = await prisma.formResponse.findUnique({
-    where: {
-      formId_respondentId: {
-        formId: params.formId,
-        respondentId: user.id,
-      },
-    },
-  });
-
-  if (existing?.isSubmitted) {
-    set.status = 400;
-    return {
-      success: false,
-      message: "You have already submitted this form",
-    };
-  }
-
-  const response = await prisma.formResponse.upsert({
-    where: {
-      formId_respondentId: {
-        formId: params.formId,
-        respondentId: user.id,
-      },
-    },
-    update: {
-      answers: body.answers,
-      isSubmitted: true,
-      submittedAt: new Date(),
-    },
-    create: {
+  const response = await prisma.formResponse.create({
+    data: {
       formId: params.formId,
       respondentId: user.id,
       answers: body.answers,
-<<<<<<< HEAD
-      isSubmitted: true,
-      submittedAt: new Date(),
-=======
       isSubmitted: body.isSubmitted ?? false,
->>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
     },
   });
   logger.info(
@@ -87,69 +55,22 @@ export async function submitResponse({
   };
 }
 
-export async function saveDraftResponse({
+export async function resumeResponse({
   params,
   body,
   user,
-  set,
-}: FormResponseContext) {
-  const form = await prisma.form.findUnique({
+}: ResumeResponseContext) {
+  const response = await prisma.formResponse.updateMany({
     where: {
-      id: params.formId,
-    },
-  });
-
-  if (!form) {
-    logger.warn(`Form with ID ${params.formId} not found`);
-    set.status = 404;
-    return {
-      success: false,
-      message: "Form not found",
-    };
-  }
-
-  const existing = await prisma.formResponse.findUnique({
-    where: {
-      formId_respondentId: {
-        formId: params.formId,
-        respondentId: user.id,
-      },
-    },
-  });
-
-  if (existing?.isSubmitted) {
-    set.status = 400;
-    return {
-      success: false,
-      message: "Response already submitted and cannot be edited",
-    };
-  }
-
-  const response = await prisma.formResponse.upsert({
-    where: {
-      formId_respondentId: {
-        formId: params.formId,
-        respondentId: user.id,
-      },
-    },
-    update: {
-      answers: body.answers,
-      isSubmitted: false,
-    },
-    create: {
-      formId: params.formId,
+      id: params.responseId,
       respondentId: user.id,
+    },
+    data: {
       answers: body.answers,
       isSubmitted: body.isSubmitted ?? false,
     },
   });
 
-<<<<<<< HEAD
-  logger.info(`User ${user.id} saved draft response for form ${params.formId}`);
-  return {
-    success: true,
-    message: "Draft response saved successfully",
-=======
   if (response.count === 0) {
     logger.warn(`No response found with ID ${params.responseId} to update`);
     return {
@@ -166,7 +87,6 @@ export async function saveDraftResponse({
     message: body.isSubmitted
       ? "Response submitted successfully"
       : "Draft saved successfully",
->>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
     data: response,
   };
 }
@@ -197,7 +117,6 @@ export async function getResponseForFormOwner({
   const responses = await prisma.formResponse.findMany({
     where: {
       formId: params.formId,
-      isSubmitted: true,
     },
     select: {
       id: true,
@@ -267,7 +186,6 @@ export async function getSubmittedResponse({
     where: {
       respondentId: user.id,
       formId: params.formId,
-      isSubmitted: true,
     },
     select: {
       id: true,
@@ -335,68 +253,16 @@ export async function getSubmittedResponse({
   };
 }
 
-<<<<<<< HEAD
-export async function getDraftResponse({
-  params,
-  user,
-  set,
-}: GetSubmittedResponseContext) {
-  const draft = await prisma.formResponse.findFirst({
-    where: {
-      respondentId: user.id,
-      formId: params.formId,
-      isSubmitted: false,
-=======
 // Get all responses submitted by the current user across all forms
 export async function getAllUserResponses({ user }: { user: { id: string } }) {
   const responses = await prisma.formResponse.findMany({
     where: {
       respondentId: user.id,
->>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
     },
     select: {
       id: true,
       formId: true,
       answers: true,
-<<<<<<< HEAD
-      form: {
-        select: { title: true },
-      },
-    },
-  });
-
-  if (!draft) {
-    set.status = 404;
-    return {
-      success: false,
-      message: "No draft found",
-    };
-  }
-
-  const fields = await prisma.formFields.findMany({
-    where: { formId: params.formId },
-    select: { id: true, fieldName: true },
-  });
-
-  const map = Object.fromEntries(fields.map((f) => [f.id, f.fieldName]));
-
-  const transformed: Record<string, any> = {};
-
-  for (const [fieldId, value] of Object.entries(
-    draft.answers as Record<string, any>,
-  )) {
-    transformed[map[fieldId] ?? fieldId] = value;
-  }
-
-  return {
-    success: true,
-    data: {
-      id: draft.id,
-      formId: draft.formId,
-      formTitle: draft.form.title,
-      answers: transformed,
-    },
-=======
       isSubmitted: true,
       submittedAt: true,
       updatedAt: true,
@@ -462,6 +328,5 @@ export async function getAllUserResponses({ user }: { user: { id: string } }) {
     success: true,
     message: "Responses retrieved successfully",
     data: formattedResponses,
->>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
   };
 }
