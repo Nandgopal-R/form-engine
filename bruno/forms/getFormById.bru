@@ -20,75 +20,45 @@ settings {
 }
 
 docs {
-  # Get Form By ID
+  # 3. Get Form By ID
   
-  ## Endpoint
-  `GET /forms/:formId`
+  Retrieves the details of a specific form. This endpoint is scoped to the **owner**, meaning a user can only fetch forms they created. If a form exists but belongs to another user, it will return a 404 error.
   
-  ## Description
-  Fetches a form owned by the authenticated user along with its fields in order.
+  * **URL:** `/forms/:formId`
+  * **Method:** `GET`
+  * **Auth Required:** Yes
   
-  ## Controller
-  `getFormById`
+  ### Path Parameters
   
-  ## Auth Required
-  ✅ Yes (User must be the form owner)
+  | Parameter | Type | Description |
+  | :--- | :--- | :--- |
+  | `formId` | `string` (UUID) | The unique ID of the form to retrieve. |
   
-  ## Path Parameters
+  ### Responses
   
-  | Name   | Type   | Required | Description |
-  |--------|--------|----------|-------------|
-  | formId | string | Yes      | ID of the form |
+  #### ✅ 200 OK: Success
   
-  ## Request Body
-  None
-  
-  ## Responses
-  
-  ### Success Response (Form with Fields)
-  
-  #### Status: 200 OK
+  Returns the full form object.
   
   ```json
   {
     "success": true,
     "message": "Form fetched successfully",
-    "form": {
-      "id": "form_456",
-      "title": "Job Application",
-      "description": "Apply for internship",
-      "isPublished": false,
-      "createdAt": "2026-02-07T10:30:00.000Z"
-    },
-    "fields": [
-      {
-        "id": "field_1",
-        "formId": "form_456",
-        "fieldName": "Full Name",
-        "fieldType": "text",
-        "prevFieldId": null
-      },
-      {
-        "id": "field_2",
-        "formId": "form_456",
-        "fieldName": "Email",
-        "fieldType": "email",
-        "prevFieldId": "field_1"
-      }
-    ]
+    "data": {
+      "id": "form_uuid_123",
+      "title": "Customer Feedback Survey",
+      "description": "A survey to collect customer opinions.",
+      "isPublished": true,
+      "ownerId": "user_uuid_555",
+      "createdAt": "2023-10-27T10:00:00.000Z",
+      "updatedAt": "2023-10-27T12:00:00.000Z"
+    }
   }
   
-  Success Response (No Fields Found)
-  Status: 200 OK
+  ❌ 404 Not Found
   
-  {
-    "success": true,
-    "message": "No forms fields found",
-    "data": []
-  }
-  
-  Error Responses
-  Status: 404 Not Found
+  Occurs if the formId does not exist OR if the form belongs to a different user.
+  JSON
   
   {
     "success": false,
