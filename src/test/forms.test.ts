@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
 
 // ---------- MOCK PRISMA ----------
-const findManyMock = mock();
+const formFindManyMock = mock();
+const formFieldsFindManyMock = mock();
 const createMock = mock();
 const findFirstMock = mock();
 const updateMock = mock();
@@ -10,11 +11,14 @@ const deleteManyMock = mock();
 mock.module("../db/prisma", () => ({
   prisma: {
     form: {
-      findMany: findManyMock,
+      findMany: formFindManyMock,
       create: createMock,
       findFirst: findFirstMock,
       update: updateMock,
       deleteMany: deleteManyMock,
+    },
+    formFields: {
+      findMany: formFieldsFindManyMock,
     },
   },
 }));
@@ -37,7 +41,8 @@ const { getAllForms, createForm, getFormById, updateForm, deleteForm } =
 
 describe("Forms Controller Tests", () => {
   beforeEach(() => {
-    findManyMock.mockReset();
+    formFindManyMock.mockReset();
+    formFieldsFindManyMock.mockReset();
     createMock.mockReset();
     findFirstMock.mockReset();
     updateMock.mockReset();
@@ -51,7 +56,7 @@ describe("Forms Controller Tests", () => {
   // ===== getAllForms =====
 
   it("getAllForms → success", async () => {
-    findManyMock.mockResolvedValue([
+    formFindManyMock.mockResolvedValue([
       { id: "1", title: "A", isPublished: true, createdAt: new Date() },
     ]);
 
@@ -62,7 +67,7 @@ describe("Forms Controller Tests", () => {
   });
 
   it("getAllForms → empty", async () => {
-    findManyMock.mockResolvedValue([]);
+    formFindManyMock.mockResolvedValue([]);
 
     const res = await getAllForms({ user } as any);
 
@@ -71,7 +76,7 @@ describe("Forms Controller Tests", () => {
   });
 
   it("getAllForms → DB error", async () => {
-    findManyMock.mockRejectedValue(new Error("DB fail"));
+    formFindManyMock.mockRejectedValue(new Error("DB fail"));
 
     expect(getAllForms({ user } as any)).rejects.toThrow();
   });
@@ -113,26 +118,69 @@ describe("Forms Controller Tests", () => {
 
   // ===== getFormById =====
 
-  it("getFormById → found", async () => {
-    findFirstMock.mockResolvedValue({ id: "1" });
+  it("getFormById → found with ordered fields", async () => {
+    findFirstMock.mockResolvedValue({
+      id: "1",
+      title: "Test Form",
+      description: "Desc",
+      isPublished: false,
+      createdAt: new Date(),
+    });
+
+    formFieldsFindManyMock.mockResolvedValue([
+      { id: "f1", formId: "1", prevFieldId: null },
+      { id: "f2", formId: "1", prevFieldId: "f1" },
+    ]);
 
     const set: any = {};
+
     const res = await getFormById({
       user,
-      params: { id: "1" },
+      params: { formId: "1" },
+      set,
+    } as any);
+
+    const result: any = res;
+
+    expect(result.success).toBe(true);
+    expect(result.form.id).toBe("1");
+    expect(result.fields.length).toBe(2);
+    expect(result.fields[0].id).toBe("f1");
+    expect(result.fields[1].id).toBe("f2");
+  });
+
+  it("getFormById → no fields", async () => {
+    findFirstMock.mockResolvedValue({
+      id: "1",
+      title: "Test Form",
+      description: "Desc",
+      isPublished: false,
+      createdAt: new Date(),
+    });
+
+    formFieldsFindManyMock.mockResolvedValue([]);
+
+    const set: any = {};
+
+    const res = await getFormById({
+      user,
+      params: { formId: "1" },
       set,
     } as any);
 
     expect(res.success).toBe(true);
+    expect(res.data).toEqual([]);
+    expect(res.message).toBe("No forms fields found");
   });
 
   it("getFormById → not found", async () => {
     findFirstMock.mockResolvedValue(null);
 
     const set: any = {};
+
     const res = await getFormById({
       user,
-      params: { id: "2" },
+      params: { formId: "2" },
       set,
     } as any);
 
@@ -145,10 +193,10 @@ describe("Forms Controller Tests", () => {
 
     const set: any = {};
 
-    expect(
+    await expect(
       getFormById({
         user,
-        params: { id: "1" },
+        params: { formId: "1" },
         set,
       } as any),
     ).rejects.toThrow();
