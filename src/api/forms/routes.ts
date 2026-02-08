@@ -10,11 +10,20 @@ import {
   deleteForm,
   getAllForms,
   getFormById,
+  getPublicFormById,
   publishForm,
   unPublishForm,
   updateForm,
 } from "./controller";
 
+// Public routes (no auth required for respondents)
+export const publicFormRoutes = new Elysia({ prefix: "/forms" }).get(
+  "/public/:formId",
+  getPublicFormById,
+  getFormByIdDTO,
+);
+
+// Protected routes (require auth)
 export const formRoutes = new Elysia({ prefix: "/forms" })
   .use(requireAuth)
   .get("/", getAllForms)

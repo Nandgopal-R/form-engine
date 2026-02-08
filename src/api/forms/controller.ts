@@ -4,6 +4,7 @@ import type {
   Context,
   CreateFormContext,
   GetFormByIdContext,
+  GetPublicFormByIdContext,
   UpdateFormContext,
 } from "../../types/forms";
 
@@ -14,6 +15,13 @@ export async function getAllForms({ user }: Context) {
       title: true,
       isPublished: true,
       createdAt: true,
+      _count: {
+        select: {
+          formResponses: {
+            where: { isSubmitted: true },
+          },
+        },
+      },
     },
     where: { ownerId: user.id },
   });
@@ -27,6 +35,15 @@ export async function getAllForms({ user }: Context) {
     };
   }
 
+  // Transform to include responseCount
+  const formsWithCount = forms.map((form) => ({
+    id: form.id,
+    title: form.title,
+    isPublished: form.isPublished,
+    createdAt: form.createdAt,
+    responseCount: form._count.formResponses,
+  }));
+
   logger.info("Fetched all forms for user", {
     userId: user.id,
     formCount: forms.length,
@@ -34,7 +51,7 @@ export async function getAllForms({ user }: Context) {
   return {
     success: true,
     message: "All forms fetched successfully",
-    data: forms,
+    data: formsWithCount,
   };
 }
 
@@ -73,11 +90,45 @@ export async function getFormById({ user, params, set }: GetFormByIdContext) {
     };
   }
 
+<<<<<<< HEAD
+=======
+  const fields = await prisma.formFields.findMany({
+    where: { formId: params.formId },
+  });
+
+  if (fields.length === 0) {
+    logger.info(`No fields found for formId: ${params.formId}`);
+    return {
+      success: true,
+      message: "Form fetched successfully (no fields)",
+      data: { ...form, fields: [] },
+    };
+  }
+
+  const ordered: typeof fields = [];
+
+  let current = fields.find(
+    (f): f is (typeof fields)[number] => f.prevFieldId === null,
+  );
+
+  while (current) {
+    ordered.push(current);
+
+    current = fields.find(
+      (f): f is (typeof fields)[number] => f.prevFieldId === current!.id,
+    );
+  }
+
+>>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
   logger.info("Fetched form for user", { userId: user.id, formId: form.id });
   return {
     success: true,
     message: "Form fetched successfully",
+<<<<<<< HEAD
     data: form,
+=======
+    data: { ...form, fields: ordered },
+>>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
   };
 }
 
@@ -222,5 +273,66 @@ export async function unPublishForm({ user, params, set }: GetFormByIdContext) {
     success: true,
     message: "Form unpublished successfully",
     data: form,
+  };
+}
+
+// Public endpoint - any authenticated user can access published forms
+export async function getPublicFormById({
+  params,
+  set,
+}: GetPublicFormByIdContext) {
+  const form = await prisma.form.findFirst({
+    where: {
+      id: params.formId,
+      isPublished: true, // Only allow access to published forms
+    },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      isPublished: true,
+      createdAt: true,
+    },
+  });
+
+  if (!form) {
+    set.status = 404;
+    return {
+      success: false,
+      message: "Form not found or not published",
+    };
+  }
+
+  const fields = await prisma.formFields.findMany({
+    where: { formId: params.formId },
+  });
+
+  if (fields.length === 0) {
+    logger.info(`No fields found for public formId: ${params.formId}`);
+    return {
+      success: true,
+      message: "Form fetched successfully (no fields)",
+      data: { ...form, fields: [] },
+    };
+  }
+
+  // Order fields by linked list structure
+  const ordered: typeof fields = [];
+  let current = fields.find(
+    (f): f is (typeof fields)[number] => f.prevFieldId === null,
+  );
+
+  while (current) {
+    ordered.push(current);
+    current = fields.find(
+      (f): f is (typeof fields)[number] => f.prevFieldId === current!.id,
+    );
+  }
+
+  logger.info("Fetched public form", { formId: form.id });
+  return {
+    success: true,
+    message: "Form fetched successfully",
+    data: { ...form, fields: ordered },
   };
 }

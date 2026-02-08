@@ -69,12 +69,16 @@ export async function submitResponse({
       formId: params.formId,
       respondentId: user.id,
       answers: body.answers,
+<<<<<<< HEAD
       isSubmitted: true,
       submittedAt: new Date(),
+=======
+      isSubmitted: body.isSubmitted ?? false,
+>>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
     },
   });
   logger.info(
-    `User ${user.id} submitted response ${response.id} for form ${params.formId}`,
+    `User ${user.id} ${body.isSubmitted ? "submitted" : "saved draft"} response ${response.id} for form ${params.formId}`,
   );
   return {
     success: true,
@@ -136,13 +140,33 @@ export async function saveDraftResponse({
       formId: params.formId,
       respondentId: user.id,
       answers: body.answers,
+      isSubmitted: body.isSubmitted ?? false,
     },
   });
 
+<<<<<<< HEAD
   logger.info(`User ${user.id} saved draft response for form ${params.formId}`);
   return {
     success: true,
     message: "Draft response saved successfully",
+=======
+  if (response.count === 0) {
+    logger.warn(`No response found with ID ${params.responseId} to update`);
+    return {
+      success: false,
+      message: "No response found to update",
+    };
+  }
+
+  logger.info(
+    `Response ${params.responseId} ${body.isSubmitted ? "submitted" : "updated as draft"}`,
+  );
+  return {
+    success: true,
+    message: body.isSubmitted
+      ? "Response submitted successfully"
+      : "Draft saved successfully",
+>>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
     data: response,
   };
 }
@@ -297,6 +321,7 @@ export async function getSubmittedResponse({
       formId: r.formId,
       formTitle: r.form.title,
       answers: transformedAnswers,
+      rawAnswers: r.answers, // Include raw answers with field IDs for form loading
     };
   });
 
@@ -310,6 +335,7 @@ export async function getSubmittedResponse({
   };
 }
 
+<<<<<<< HEAD
 export async function getDraftResponse({
   params,
   user,
@@ -320,11 +346,19 @@ export async function getDraftResponse({
       respondentId: user.id,
       formId: params.formId,
       isSubmitted: false,
+=======
+// Get all responses submitted by the current user across all forms
+export async function getAllUserResponses({ user }: { user: { id: string } }) {
+  const responses = await prisma.formResponse.findMany({
+    where: {
+      respondentId: user.id,
+>>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
     },
     select: {
       id: true,
       formId: true,
       answers: true,
+<<<<<<< HEAD
       form: {
         select: { title: true },
       },
@@ -362,5 +396,72 @@ export async function getDraftResponse({
       formTitle: draft.form.title,
       answers: transformed,
     },
+=======
+      isSubmitted: true,
+      submittedAt: true,
+      updatedAt: true,
+      form: {
+        select: {
+          id: true,
+          title: true,
+          description: true,
+        },
+      },
+    },
+    orderBy: {
+      updatedAt: "desc",
+    },
+  });
+
+  if (responses.length === 0) {
+    logger.info(`No responses found for user ${user.id}`);
+    return {
+      success: true,
+      message: "No responses found",
+      data: [],
+    };
+  }
+
+  // For each response, get the field names to transform answers
+  const formattedResponses = await Promise.all(
+    responses.map(async (r) => {
+      const fields = await prisma.formFields.findMany({
+        where: { formId: r.formId },
+        select: { id: true, fieldName: true },
+      });
+
+      const fieldIdToNameMap = Object.fromEntries(
+        fields.map((f) => [f.id, f.fieldName]),
+      );
+
+      const transformedAnswers: Record<string, unknown> = {};
+      for (const [fieldId, value] of Object.entries(
+        r.answers as Record<string, unknown>,
+      )) {
+        const fieldName = fieldIdToNameMap[fieldId] ?? fieldId;
+        transformedAnswers[fieldName] = value;
+      }
+
+      return {
+        id: r.id,
+        formId: r.formId,
+        formTitle: r.form.title,
+        formDescription: r.form.description,
+        answers: transformedAnswers,
+        isSubmitted: r.isSubmitted,
+        submittedAt: r.submittedAt,
+        updatedAt: r.updatedAt,
+      };
+    }),
+  );
+
+  logger.info(
+    `Retrieved ${formattedResponses.length} responses for user ${user.id}`,
+  );
+  return {
+    success: true,
+    message: "Responses retrieved successfully",
+    data: formattedResponses,
+>>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
   };
 }

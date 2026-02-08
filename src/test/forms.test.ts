@@ -60,28 +60,53 @@ describe("Forms Controller Tests", () => {
   // ==============================
 
   it("getAllForms → success", async () => {
+<<<<<<< HEAD
     findManyMock.mockResolvedValue([
       { id: "1", title: "A", isPublished: true, createdAt: new Date() },
+=======
+    formFindManyMock.mockResolvedValue([
+      {
+        id: "1",
+        title: "A",
+        isPublished: true,
+        createdAt: new Date(),
+        _count: { formResponses: 3 },
+      },
+>>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
     ]);
 
-    const res = await getAllForms({ user } as any);
+    const res: any = await getAllForms({ user } as any);
 
     expect(res.success).toBe(true);
+<<<<<<< HEAD
     expect(res.data!.length).toBe(1);
+=======
+    expect(res.data.length).toBe(1);
+    expect(res.data[0].responseCount).toBe(3);
+>>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
   });
 
   it("getAllForms → empty", async () => {
     findManyMock.mockResolvedValue([]);
 
-    const res = await getAllForms({ user } as any);
+    const res: any = await getAllForms({ user } as any);
 
     expect(res.message).toBe("No forms found");
     expect(res.data).toEqual([]);
   });
 
+<<<<<<< HEAD
   // ==============================
   // createForm
   // ==============================
+=======
+  it("getAllForms → DB error", async () => {
+    formFindManyMock.mockRejectedValue(new Error("DB fail"));
+    expect(getAllForms({ user } as any)).rejects.toThrow();
+  });
+
+  // ===== createForm =====
+>>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
 
   it("createForm → success", async () => {
     createMock.mockResolvedValue({ id: "1", title: "New" });
@@ -102,13 +127,49 @@ describe("Forms Controller Tests", () => {
     findFirstMock.mockResolvedValue({ id: "1" });
 
     const set: any = {};
+<<<<<<< HEAD
     const res = await getFormById({
+=======
+
+    const res: any = await getFormById({
       user,
       params: { formId: "1" },
       set,
     } as any);
 
     expect(res.success).toBe(true);
+    expect(res.data.id).toBe("1");
+    expect(res.data.fields.length).toBe(2);
+    expect(res.data.fields[0].id).toBe("f1");
+    expect(res.data.fields[1].id).toBe("f2");
+  });
+
+  it("getFormById → no fields", async () => {
+    findFirstMock.mockResolvedValue({
+      id: "1",
+      title: "Test Form",
+      description: "Desc",
+      isPublished: false,
+      createdAt: new Date(),
+    });
+
+    formFieldsFindManyMock.mockResolvedValue([]);
+
+    const set: any = {};
+
+    const res: any = await getFormById({
+>>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
+      user,
+      params: { formId: "1" },
+      set,
+    } as any);
+
+    expect(res.success).toBe(true);
+<<<<<<< HEAD
+=======
+    expect(res.message).toBe("Form fetched successfully (no fields)");
+    expect(res.data.fields).toEqual([]);
+>>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
   });
 
   it("getFormById → not found", async () => {
@@ -161,9 +222,28 @@ describe("Forms Controller Tests", () => {
     expect(set.status).toBe(404);
   });
 
+<<<<<<< HEAD
   // ==============================
   // deleteForm
   // ==============================
+=======
+  it("updateForm → DB error", async () => {
+    findFirstMock.mockRejectedValue(new Error("DB fail"));
+
+    const set: any = {};
+
+    expect(
+      updateForm({
+        user,
+        params: { formId: "1" },
+        body: { title: "T", description: "D" },
+        set,
+      } as any),
+    ).rejects.toThrow();
+  });
+
+  // ===== deleteForm =====
+>>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
 
   it("deleteForm → success", async () => {
     deleteManyMock.mockResolvedValue({ count: 1 });
@@ -204,6 +284,7 @@ describe("Forms Controller Tests", () => {
 
     const set: any = {};
 
+<<<<<<< HEAD
     const res = await publishForm({
       user,
       params: { formId: "1" },
@@ -260,5 +341,14 @@ describe("Forms Controller Tests", () => {
 
     expect(res.success).toBe(false);
     expect(set.status).toBe(404);
+=======
+    expect(
+      deleteForm({
+        user,
+        params: { formId: "1" },
+        set,
+      } as any),
+    ).rejects.toThrow();
+>>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
   });
 });

@@ -45,7 +45,11 @@ const {
   saveDraftResponse,
   getResponseForFormOwner,
   getSubmittedResponse,
+<<<<<<< HEAD
   getDraftResponse,
+=======
+  getAllUserResponses,
+>>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
 } = await import("../api/form-response/controller");
 
 describe("Form Response Controller Tests", () => {
@@ -66,7 +70,7 @@ describe("Form Response Controller Tests", () => {
   // submitResponse
   // =====================================================
 
-  it("submitResponse → success", async () => {
+  it("submitResponse → success (submitted)", async () => {
     formFindUniqueMock.mockResolvedValue({
       id: "f1",
       isPublished: true,
@@ -80,7 +84,7 @@ describe("Form Response Controller Tests", () => {
 
     const res = await submitResponse({
       params: { formId: "f1" },
-      body: { answers: {} },
+      body: { answers: {}, isSubmitted: true },
       user,
       set,
     } as any);
@@ -129,6 +133,7 @@ describe("Form Response Controller Tests", () => {
       isPublished: true,
     });
 
+<<<<<<< HEAD
     formResponseFindUniqueMock.mockResolvedValue({
       isSubmitted: true,
     });
@@ -138,6 +143,26 @@ describe("Form Response Controller Tests", () => {
     const res = await submitResponse({
       params: { formId: "f1" },
       body: { answers: {} },
+=======
+  it("resumeResponse → success (submit)", async () => {
+    formResponseUpdateManyMock.mockResolvedValue({ count: 1 });
+
+    const res = await resumeResponse({
+      params: { responseId: "r1" },
+      body: { answers: {}, isSubmitted: true },
+      user,
+    } as any);
+
+    expect(res.success).toBe(true);
+  });
+
+  it("resumeResponse → success (draft)", async () => {
+    formResponseUpdateManyMock.mockResolvedValue({ count: 1 });
+
+    const res = await resumeResponse({
+      params: { responseId: "r1" },
+      body: { answers: {}, isSubmitted: false },
+>>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
       user,
       set,
     } as any);
@@ -220,6 +245,43 @@ describe("Form Response Controller Tests", () => {
 
     expect(res.success).toBe(true);
     expect(res.data!.length).toBe(1);
+<<<<<<< HEAD
+=======
+  });
+
+  it("getResponseForFormOwner → form not found", async () => {
+    formFindUniqueMock.mockResolvedValue(null);
+
+    const set: any = {};
+
+    const res = await getResponseForFormOwner({
+      params: { formId: "f1" },
+      user,
+      set,
+    } as any);
+
+    expect(res.success).toBe(false);
+    expect(set.status).toBe(404);
+>>>>>>> 1e9d4e8 (fix: fix getFormById and form-responses for integration)
+  });
+
+  it("getResponseForFormOwner → no responses", async () => {
+    formFindUniqueMock.mockResolvedValue({
+      id: "f1",
+      ownerId: user.id,
+    });
+
+    formResponseFindManyMock.mockResolvedValue([]);
+
+    const set: any = {};
+
+    const res = await getResponseForFormOwner({
+      params: { formId: "f1" },
+      user,
+      set,
+    } as any);
+
+    expect(res.success).toBe(false);
   });
 
   // =====================================================
@@ -293,5 +355,45 @@ describe("Form Response Controller Tests", () => {
 
     expect(res.success).toBe(false);
     expect(set.status).toBe(404);
+  });
+
+  // =====================================================
+  // getAllUserResponses
+  // =====================================================
+
+  it("getAllUserResponses → success", async () => {
+    formResponseFindManyMock.mockResolvedValue([
+      {
+        id: "r1",
+        formId: "f1",
+        answers: { field1: "A" },
+        isSubmitted: true,
+        submittedAt: new Date(),
+        updatedAt: new Date(),
+        form: {
+          id: "f1",
+          title: "Form A",
+          description: "Desc",
+        },
+      },
+    ]);
+
+    formFieldsFindManyMock.mockResolvedValue([
+      { id: "field1", fieldName: "Name" },
+    ]);
+
+    const res = await getAllUserResponses({ user });
+
+    expect(res.success).toBe(true);
+    expect(res.data.length).toBe(1);
+  });
+
+  it("getAllUserResponses → empty", async () => {
+    formResponseFindManyMock.mockResolvedValue([]);
+
+    const res = await getAllUserResponses({ user });
+
+    expect(res.success).toBe(true);
+    expect(res.data).toEqual([]);
   });
 });

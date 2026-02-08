@@ -35,30 +35,30 @@ settings {
 docs {
   # Create Field
   
-  Adds a new field to a form. This endpoint handles the **linked-list ordering** logic automatically. You can insert a field at the very beginning (Head) or after a specific existing field.
+  Adds a new field to a form. This endpoint handles the linked-list ordering logic automatically. You can insert a field at the very beginning (Head) or after a specific existing field.
   
-  * **URL:** `/forms/:formId/fields`
-  * **Method:** `POST`
-  * **Auth Required:** Yes
+  - **URL:** `/forms/:formId/fields`
+  - **Method:** `POST`
+  - **Auth Required:** Yes
   
-  ### Path Parameters
+  ## Path Parameters
   
   | Parameter | Type | Description |
-  | :--- | :--- | :--- |
+  |---|---|---|
   | `formId` | `string` (UUID) | The ID of the form to add the field to. |
   
-  ### Request Body
+  ## Request Body
   
   | Field | Type | Required | Description |
-  | :--- | :--- | :--- | :--- |
+  |---|---|---|---|
   | `fieldName` | `string` | Yes | Internal unique name for the field (e.g., "user_email"). |
   | `label` | `string` | Yes | The question text shown to users. |
   | `fieldValueType` | `string` | Yes | Data type (e.g., "string", "number", "boolean"). |
-  | `fieldType` | `string` | Yes | UI Component type (e.g., "text", "select", "radio"). |
-  | `prevFieldId` | `string` | No | The ID of the field *after which* this new field should be inserted. Send `null` or omit to insert at the top (as the first question). |
+  | `fieldType` | `string` | Yes | UI component type (e.g., "text", "select", "radio"). |
+  | `prevFieldId` | `string \| null` | No | ID of the field after which the new field should be inserted. Omit or send `null` to insert at the beginning. |
   | `validation` | `object` | No | JSON object for validation rules (e.g., `{ "required": true }`). |
   
-  **Sample Input (Insert at Top/Head):**
+  ## Sample Input (Insert at Top)
   
   ```json
   {
@@ -71,10 +71,11 @@ docs {
       "required": true
     }
   }
+  ```
   
-  Sample Input (Insert after an existing field):
-  JSON
+  ## Sample Input (Insert After Another Field)
   
+  ```json
   {
     "fieldName": "age",
     "label": "How old are you?",
@@ -82,13 +83,13 @@ docs {
     "fieldType": "number",
     "prevFieldId": "uuid-of-previous-field-123"
   }
+  ```
   
-  Responses
-  ✅ 200 OK: Created
+  ## Responses
   
-  Returns the newly created field object.
-  JSON
+  ### 200 OK — Created
   
+  ```json
   {
     "success": true,
     "message": "Field created successfully",
@@ -102,28 +103,18 @@ docs {
         "required": true
       },
       "formId": "form_xyz_789",
-      "prevFieldId": null,
-      "createdAt": "2023-10-27T10:00:00.000Z"
+      "prevFieldId": null
     }
   }
+  ```
   
-  ❌ 400 Bad Request: Invalid Position
+  ### 404 Not Found — Form Missing
   
-  Occurs if prevFieldId is provided but that field does not exist in this form (meaning you are trying to insert after a field that doesn't exist).
-  JSON
-  
-  {
-    "success": false,
-    "message": "Previous field not found in the specified form"
-  }
-  
-  ❌ 404 Not Found: Form Missing
-  
-  Occurs if the form does not exist or the user does not have permission to edit it.
-  JSON
-  
+  ```json
   {
     "success": false,
     "message": "Form not found"
   }
+  ```
+  
 }
