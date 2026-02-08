@@ -1,0 +1,96 @@
+meta {
+  name: draftResponse
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8000/responses/draft/:formId
+  body: json
+  auth: inherit
+}
+
+params:path {
+  formId: 4a386821-772f-4928-b01f-034daf8dc456
+}
+
+body:json {
+  {
+    "answers":{
+      "14ba7ca4-8db7-48d7-8d40-d6a2d43ecc75": "8282476890"
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Save Draft Response
+  
+  ## Endpoint
+  `POST /forms/:formId/draft`
+  
+  ## Description
+  Saves or updates a draft response for a form. If a response already exists, it is updated. If the response has already been submitted, saving a draft is not allowed.
+  
+  ## Controller
+  `saveDraftResponse`
+  
+  ## Auth Required
+  ✅ Yes (User must be logged in)
+  
+  ## Path Parameters
+  
+  | Name   | Type   | Required | Description |
+  |--------|--------|----------|-------------|
+  | formId | string | Yes      | ID of the form |
+  
+  ## Request Body
+  
+  ```json
+  {
+    "answers": {
+      "fieldId1": "Partial Answer 1",
+      "fieldId2": "Partial Answer 2"
+    }
+  }
+  
+  Responses
+  Success Response
+  Status: 200 OK
+  
+  {
+    "success": true,
+    "message": "Draft response saved successfully",
+    "data": {
+      "id": "response_123",
+      "formId": "form_456",
+      "respondentId": "user_789",
+      "answers": {
+        "fieldId1": "Partial Answer 1",
+        "fieldId2": "Partial Answer 2"
+      },
+      "isSubmitted": false,
+      "submittedAt": null,
+      "updatedAt": "2026-02-07T10:30:00.000Z"
+    }
+  }
+  
+  Error Responses
+  Status: 404 Not Found
+  
+  {
+    "success": false,
+    "message": "Form not found"
+  }
+  
+  Status: 400 Bad Request
+  
+  {
+    "success": false,
+    "message": "Response already submitted and cannot be edited"
+  }
+}

@@ -129,9 +129,11 @@ model FormResponse {
   respondent   User?   @relation(fields: [respondentId], references: [id], onDelete: SetNull)
 
   answers     Json
-  submittedAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isSubmitted Boolean   @default(false)
+  submittedAt DateTime?
+  updatedAt   DateTime  @updatedAt
 
+  @@unique([formId, respondentId])
   @@index([formId])
   @@map("form_response")
 }

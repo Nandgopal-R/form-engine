@@ -1,0 +1,76 @@
+meta {
+  name: getDraftResponse
+  type: http
+  seq: 5
+}
+
+get {
+  url: http://localhost:8000/responses/draft/:formId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  formId: 4a386821-772f-4928-b01f-034daf8dc456
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get Draft Response
+  
+  ## Endpoint
+  `GET /forms/:formId/draft`
+  
+  ## Description
+  Fetches the current user's saved draft response for a specific form (i.e., a response that is not yet submitted).
+  
+  Field IDs stored in the database are converted into human-readable field names before returning.
+  
+  ## Controller
+  `getDraftResponse`
+  
+  ## Auth Required
+  ✅ Yes (User must be logged in)
+  
+  ## Path Parameters
+  
+  | Name   | Type   | Required | Description |
+  |--------|--------|----------|-------------|
+  | formId | string | Yes      | ID of the form |
+  
+  ## Request Body
+  None
+  
+  ## Responses
+  
+  ### Success Response
+  
+  #### Status: 200 OK
+  
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "response_123",
+      "formId": "form_456",
+      "formTitle": "Job Application Form",
+      "answers": {
+        "Full Name": "John Doe",
+        "Email": "john@example.com",
+        "Experience": "2 years"
+      }
+    }
+  }
+  
+  Error Responses
+  Status: 404 Not Found
+  
+  {
+    "success": false,
+    "message": "No draft found"
+  }
+}
