@@ -7,6 +7,7 @@ import {
 } from "../../types/form-response";
 import { requireAuth } from "../auth/requireAuth";
 import {
+  getAllUserResponses,
   getResponseForFormOwner,
   getSubmittedResponse,
   resumeResponse,
@@ -18,5 +19,6 @@ export const formResponseRoutes = new Elysia({ prefix: "/responses" })
   .post("/submit/:formId", submitResponse, formResponseDTO)
   .post("/draft/:formId", submitResponse, formResponseDTO)
   .put("/resume/:responseId", resumeResponse, resumeResponseDTO)
+  .get("/my", getAllUserResponses)
   .get("/:formId", getResponseForFormOwner, formResponseForFormOwnerDTO)
   .get("/user/:formId", getSubmittedResponse, getSubmittedResponseDTO);
