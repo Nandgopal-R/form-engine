@@ -23,6 +23,7 @@ export const formResponseDTO = {
         t.Null(),
       ]),
     ),
+    isSubmitted: t.Optional(t.Boolean()), // true = final submission, false/undefined = draft
   }),
 };
 
@@ -49,6 +50,7 @@ export const resumeResponseDTO = {
         t.Null(),
       ]),
     ),
+    isSubmitted: t.Optional(t.Boolean()), // true = final submission, false/undefined = draft
   }),
 };
 

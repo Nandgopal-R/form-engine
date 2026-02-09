@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,18 +7,17 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(uuid())
-  email         String   @unique
+  id            String         @id @default(uuid())
+  email         String         @unique
   name          String?
-  emailVerified Boolean  @default(false)
+  emailVerified Boolean        @default(false)
   image         String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  sessions      Session[]
-  accounts      Account[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   forms         Form[]
+  accounts      Account[]
   formResponses FormResponse[]
+  sessions      Session[]
 
   @@map("user")
 }
@@ -38,8 +31,7 @@ model Session {
   userAgent String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("session")
 }
@@ -51,25 +43,22 @@ model Account {
   providerId           String
   accessToken          String?
   refreshToken         String?
-  idToken              String?
-  scope                String?
-  accessTokenExpiresAt DateTime?
   expiresAt            DateTime?
   password             String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  accessTokenExpiresAt DateTime?
+  idToken              String?
+  scope                String?
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("account")
 }
 
-// You will need this table for "Forgot Password" or "Verify Email" flows
 model Verification {
   id         String   @id @default(uuid())
   identifier String
-  value      String // The token itself
+  value      String
   expiresAt  DateTime
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -78,41 +67,31 @@ model Verification {
 }
 
 model Form {
-  id          String  @id @default(uuid())
-  title       String
-  description String?
-  isPublished Boolean @default(false)
-  formUrl     String?
-
-  ownerId String
-  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-
+  id            String         @id @default(uuid())
+  title         String
+  description   String?
+  isPublished   Boolean        @default(false)
+  formUrl       String?
+  ownerId       String
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+  owner         User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   formFields    FormFields[]
   formResponses FormResponse[]
 }
 
 model FormFields {
-  id             String  @id @default(uuid())
+  id             String   @id @default(uuid())
   fieldName      String
   label          String?
-  fieldValueType String // e.g., "string", "number", "boolean"
-  fieldType      String // e.g., "MCQ", "Radio", "Input"
-  validation     Json? // e.g., { "required": true, "min": 5 }
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // 1. Link to the parent Form
-  formId String
-  form   Form   @relation(fields: [formId], references: [id], onDelete: Cascade)
-
-  // 2. Doubly Linked List Logic (Self-Relations)
-
-  // The "Previous" Field (Parent)
-  // This field stores the ID of the field passing control to this one
-  prevFieldId String?
+  fieldValueType String
+  fieldType      String
+  validation     Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  formId         String
+  prevFieldId    String?
+  form           Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
 
   @@index([formId])
   @@index([formId, prevFieldId])
@@ -120,18 +99,15 @@ model FormFields {
 }
 
 model FormResponse {
-  id String @id @default(uuid())
-
-  formId String
-  form   Form   @relation(fields: [formId], references: [id], onDelete: Cascade)
-
+  id           String    @id @default(uuid())
+  formId       String
   respondentId String?
-  respondent   User?   @relation(fields: [respondentId], references: [id], onDelete: SetNull)
-
-  answers     Json
-  isSubmitted Boolean   @default(false)
-  submittedAt DateTime?
-  updatedAt   DateTime  @updatedAt
+  answers      Json
+  submittedAt  DateTime?
+  updatedAt    DateTime  @updatedAt
+  isSubmitted  Boolean   @default(false)
+  form         Form      @relation(fields: [formId], references: [id], onDelete: Cascade)
+  respondent   User?     @relation(fields: [respondentId], references: [id])
 
   @@unique([formId, respondentId])
   @@index([formId])

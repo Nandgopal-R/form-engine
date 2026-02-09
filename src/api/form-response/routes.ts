@@ -3,20 +3,22 @@ import {
   formResponseDTO,
   formResponseForFormOwnerDTO,
   getSubmittedResponseDTO,
+  resumeResponseDTO,
 } from "../../types/form-response";
 import { requireAuth } from "../auth/requireAuth";
 import {
-  getDraftResponse,
+  getAllUserResponses,
   getResponseForFormOwner,
   getSubmittedResponse,
-  saveDraftResponse,
+  resumeResponse,
   submitResponse,
 } from "./controller";
 
 export const formResponseRoutes = new Elysia({ prefix: "/responses" })
   .use(requireAuth)
   .post("/submit/:formId", submitResponse, formResponseDTO)
-  .post("/draft/:formId", saveDraftResponse, formResponseDTO)
+  .post("/draft/:formId", submitResponse, formResponseDTO)
+  .put("/resume/:responseId", resumeResponse, resumeResponseDTO)
+  .get("/my", getAllUserResponses)
   .get("/:formId", getResponseForFormOwner, formResponseForFormOwnerDTO)
-  .get("/user/:formId", getSubmittedResponse, getSubmittedResponseDTO)
-  .get("/draft/:formId", getDraftResponse, getSubmittedResponseDTO);
+  .get("/user/:formId", getSubmittedResponse, getSubmittedResponseDTO);

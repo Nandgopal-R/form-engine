@@ -5,6 +5,11 @@ export interface Context {
   set: { status?: number | string };
 }
 
+// Public context (no user required)
+export interface PublicContext {
+  set: { status?: number | string };
+}
+
 export const createFormDTO = {
   body: t.Object({
     title: t.String(),
@@ -25,6 +30,11 @@ export const getFormByIdDTO = {
 };
 
 export interface GetFormByIdContext extends Context {
+  params: Static<typeof getFormByIdDTO.params>;
+}
+
+// Public context for fetching published forms (no auth required)
+export interface GetPublicFormByIdContext extends PublicContext {
   params: Static<typeof getFormByIdDTO.params>;
 }
 
