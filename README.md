@@ -18,6 +18,25 @@ The platform helps colleges efficiently collect data for use cases such as event
 
 ---
 
+## Visuals
+
+### Architecture Diagram
+![Architecture Diagram](./images/ArchitectureDiagram.png)
+
+### Activity Diagram
+![Activity Diagram](./images/ActivityDiagram.jpg)
+
+### Class Diagram
+![Class Diagram](./images/class_diagram.png)
+
+### Use Case Diagram
+![Use Case Diagram](./images/FormEngineUseCase.jpeg)
+
+### Time Sequence Diagram
+![Time Sequence Diaram](./images/timeSequence.jpeg)
+
+---
+
 ## Getting Started
 
 ### Prerequisites
