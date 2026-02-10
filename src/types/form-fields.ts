@@ -29,6 +29,7 @@ export const createFieldDTO = {
     fieldValueType: t.String(),
     fieldType: t.String(),
     validation: t.Optional(t.Any()),
+    options: t.Optional(t.Any()),
     prevFieldId: t.Optional(
       t.String({
         format: "uuid",
@@ -54,6 +55,7 @@ export const updateFieldDTO = {
     fieldValueType: t.Optional(t.String()),
     fieldType: t.Optional(t.String()),
     validation: t.Optional(t.Any()),
+    options: t.Optional(t.Any()),
   }),
 };
 
