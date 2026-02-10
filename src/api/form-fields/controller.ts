@@ -90,6 +90,7 @@ export async function createField({
           fieldValueType: body.fieldValueType,
           fieldType: body.fieldType,
           validation: body.validation ?? undefined,
+          options: body.options ?? undefined,
           formId: params.formId,
           prevFieldId: null,
         },
@@ -138,6 +139,7 @@ export async function createField({
         fieldValueType: body.fieldValueType,
         fieldType: body.fieldType,
         validation: body.validation ?? undefined,
+        options: body.options ?? undefined,
         formId: params.formId,
         prevFieldId: prevField.id,
       },
@@ -191,6 +193,7 @@ export async function updateField({
       fieldValueType: body.fieldValueType,
       fieldType: body.fieldType,
       validation: body.validation ?? undefined,
+      options: body.options ?? undefined,
     },
   });
 

@@ -23,6 +23,9 @@ The platform helps colleges efficiently collect data for use cases such as event
 ### Architecture Diagram
 ![Architecture Diagram](./images/ArchitectureDiagram.png)
 
+### Schema Diagram
+![Schema Diagram](./images/schemaDiagram.png)
+
 ### Activity Diagram
 ![Activity Diagram](./images/ActivityDiagram.jpg)
 

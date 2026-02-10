@@ -87,6 +87,7 @@ model FormFields {
   fieldValueType String
   fieldType      String
   validation     Json?
+  options        Json?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   formId         String
