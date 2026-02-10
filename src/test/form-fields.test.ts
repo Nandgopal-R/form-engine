@@ -1,4 +1,3 @@
-
 import { beforeEach, describe, expect, it, mock } from "bun:test";
 
 /* ---------------- MOCKS ---------------- */
@@ -44,13 +43,8 @@ mock.module("../logger", () => ({
 
 /* ---------------- IMPORT ---------------- */
 
-const {
-  getAllFields,
-  createField,
-  updateField,
-  deleteField,
-  swapFields,
-} = await import("../api/form-fields/controller");
+const { getAllFields, createField, updateField, deleteField, swapFields } =
+  await import("../api/form-fields/controller");
 
 /* ---------------- TESTS ---------------- */
 
