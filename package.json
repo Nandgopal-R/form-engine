@@ -10,7 +10,7 @@
     "test": "bun test",
     "build": "bun build src/index.ts --outdir dist --target bun --minify",
     "prepare": "husky",
-    "start": "prisma generate && prisma migrate deploy && bun src/index.ts",
+    "start": "bun src/index.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
