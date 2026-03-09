@@ -10,7 +10,8 @@
     "test": "bun test",
     "build": "bun build src/index.ts --outdir dist --target bun --minify",
     "prepare": "husky",
-    "start": "bun dist/index.js"
+    "start": "bun src/index.ts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.1",
@@ -42,7 +43,7 @@
     ]
   },
   "resolutions": {
-    "hono": "^4.11.7",
+    "hono": "^4.11.10",
     "lodash": "^4.17.23"
   },
   "module": "src/index.ts"

@@ -50,10 +50,11 @@ const app = new Elysia()
   .use(formFieldRoutes)
   .use(formResponseRoutes);
 
-app.listen(8000);
+const port = process.env.PORT || 8000;
+app.listen(port);
 
 if (app.server) {
-  logger.success("🦊 Elysia server started", {
+  logger.success(`🦊 Elysia server started on port ${port}`, {
     host: app.server.hostname,
     port: app.server.port,
   });
