@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "test": "bun test",
     "build": "bun build src/index.ts --outdir dist --target bun --minify",
-    "prepare": "husky"
+    "prepare": "husky",
+    "start": "bun dist/index.js"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.1",
