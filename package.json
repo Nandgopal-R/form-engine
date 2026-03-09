@@ -44,6 +44,7 @@
   },
   "resolutions": {
     "hono": "^4.11.10",
+    "@hono/node-server": "^1.19.10",
     "lodash": "^4.17.23"
   },
   "module": "src/index.ts"
