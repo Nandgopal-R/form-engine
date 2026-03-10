@@ -1,0 +1,45 @@
+meta {
+  name: getFormAnalyticsPdf
+  type: http
+  seq: 10
+}
+
+post {
+  url: http://localhost:8000/forms/:formId/analytics?format=pdf
+  body: none
+  auth: inherit
+}
+
+params:query {
+  format: pdf
+}
+
+params:path {
+  formId: {{formId}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 60000
+}
+
+docs {
+  # Get Form Analytics (PDF)
+  
+  Same as getFormAnalytics but returns a downloadable PDF report.
+  
+  * **URL:** `/forms/:formId/analytics?format=pdf`
+  * **Method:** `POST`
+  * **Auth:** Required (session cookie)
+  
+  ## Path Parameters
+  * `formId` — UUID of the form to analyze
+  
+  ## Query Parameters
+  * `format` — set to `pdf` to get a PDF download
+  
+  ## Response
+  Returns a PDF file with:
+  * Content-Type: application/pdf
+  * Content-Disposition: attachment; filename="analytics-report.pdf"
+}

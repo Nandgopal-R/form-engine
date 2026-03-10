@@ -8,6 +8,48 @@ import type {
   UpdateFieldContext,
 } from "../../types/form-fields";
 
+// Public endpoint - no authentication required
+export async function getPublicFields({
+  params,
+  set,
+}: {
+  params: { formId: string };
+  set: { status?: number | string };
+}) {
+  const formExists = await prisma.form.count({
+    where: { id: params.formId, isPublished: true }, // Only published forms are public
+  });
+
+  if (formExists === 0) {
+    set.status = 404;
+    logger.warn(`Published form not found for formId: ${params.formId}`);
+    return {
+      success: false,
+      message: "Form not found or not published",
+      data: [],
+    };
+  }
+
+  const fields = await prisma.formFields.findMany({
+    where: { formId: params.formId },
+  });
+
+  if (fields.length === 0) {
+    logger.info(`No fields found for formId: ${params.formId}`);
+    return {
+      success: true,
+      data: [],
+    };
+  }
+
+  logger.info(`Found ${fields.length} fields for formId: ${params.formId}`);
+  return {
+    success: true,
+    data: fields,
+  };
+}
+
+// Authenticated endpoint
 export async function getAllFields({ params, set }: GetAllFieldsContext) {
   const formExists = await prisma.form.count({
     where: { id: params.formId },

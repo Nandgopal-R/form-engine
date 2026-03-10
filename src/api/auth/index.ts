@@ -26,6 +26,20 @@ export const auth = betterAuth({
   },
   session: {
     modelName: "session",
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    },
+  },
+
+  advanced: {
+    useSecureCookies: true, // Must be true for production (HTTPS)
+    crossSubDomainCookies: {
+      enabled: false, // Not subdomains, different domains entirely
+    },
+    defaultCookieAttributes: {
+      sameSite: "none", // CRITICAL: Allow cross-site cookies (Vercel <-> Railway)
+    },
   },
 
   emailAndPassword: {
@@ -33,7 +47,7 @@ export const auth = betterAuth({
   },
 
   emailVerification: {
-    sendOnSignUp: true,
+    sendOnSignUp: false, // Disabled until SMTP is properly configured
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
       console.log(`Attempting to send verification email to ${user.email}...`);
@@ -60,6 +74,7 @@ export const auth = betterAuth({
   },
 
   baseURL: process.env.BETTER_AUTH_URL,
+  secret: process.env.BETTER_AUTH_SECRET,
   trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",").map((o) =>
     o.trim(),
   ),

@@ -1,0 +1,41 @@
+meta {
+  name: getFormAnalytics
+  type: http
+  seq: 9
+}
+
+post {
+  url: http://localhost:8000/forms/:formId/analytics
+  body: none
+  auth: inherit
+}
+
+params:path {
+  formId: {{formId}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 60000
+}
+
+docs {
+  # Get Form Analytics (JSON)
+  
+  Generates an AI-powered analytics report for all submitted responses of a form.
+  Only the form owner can access this endpoint.
+  
+  * **URL:** `/forms/:formId/analytics`
+  * **Method:** `POST`
+  * **Auth:** Required (session cookie)
+  
+  ## Path Parameters
+  * `formId` — UUID of the form to analyze
+  
+  ## Response
+  Returns a JSON object with:
+  * `totalResponsesAnalyzed` — number of responses analyzed
+  * `executiveSummary` — high-level paragraph summarizing sentiment
+  * `quantitativeInsights` — array of metric breakdowns per question
+  * `qualitativeThemes` — array of recurring themes found in responses
+}

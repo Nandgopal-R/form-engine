@@ -1,10 +1,12 @@
 import { Elysia } from "elysia";
+import { aiGenerateFormDTO } from "../../types/ai-generate";
 import {
   createFormDTO,
   getFormByIdDTO,
   updateFormDTO,
 } from "../../types/forms";
 import { requireAuth } from "../auth/requireAuth";
+import { aiGenerateForm } from "./ai-generate";
 import {
   createForm,
   deleteForm,
@@ -28,6 +30,7 @@ export const formRoutes = new Elysia({ prefix: "/forms" })
   .use(requireAuth)
   .get("/", getAllForms)
   .post("/", createForm, createFormDTO)
+  .post("/ai-generate", aiGenerateForm, aiGenerateFormDTO)
   .get("/:formId", getFormById, getFormByIdDTO)
   .put("/:formId", updateForm, updateFormDTO)
   .delete("/:formId", deleteForm, getFormByIdDTO)
