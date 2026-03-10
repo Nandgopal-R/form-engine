@@ -1,5 +1,6 @@
 import { cors } from "@elysiajs/cors";
 import { Elysia } from "elysia";
+import { auth } from "./api/auth/index";
 import { authRoutes } from "./api/auth/routes";
 import {
   formFieldRoutes,
@@ -57,7 +58,16 @@ const app = new Elysia()
       message: "Internal server error",
     };
   })
-  .get("/", () => "🦊 Elysia server started")
+  .get("/", async ({ request, set }) => {
+    // Check if user has active session and redirect to frontend
+    const session = await auth.api.getSession({ headers: request.headers });
+    if (session) {
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+      set.redirect = `${frontendUrl}/dashboard`;
+      return;
+    }
+    return "🦊 Elysia server started";
+  })
   .use(authRoutes)
   .use(publicFormRoutes) // Public routes first (no auth)
   .use(publicFormFieldRoutes) // Public form fields (no auth)
