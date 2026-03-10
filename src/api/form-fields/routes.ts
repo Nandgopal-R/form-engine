@@ -11,6 +11,7 @@ import {
   createField,
   deleteField,
   getAllFields,
+  getPublicFields,
   swapFields,
   updateField,
 } from "./controller";
@@ -18,7 +19,7 @@ import {
 // Public routes (no auth required for viewing form fields)
 export const publicFormFieldRoutes = new Elysia({ prefix: "/fields" }).get(
   "/public/:formId",
-  getAllFields,
+  getPublicFields,
   getAllFieldsDTO,
 );
 
