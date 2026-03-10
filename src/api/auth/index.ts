@@ -56,10 +56,7 @@ export const auth = betterAuth({
         to: user.email,
         subject: "Verify your email address",
         html: `
-          <h1>Wel          cd /home/nandu/uni/sem6/se/project/form-engine
-          git add src/api/auth/index.ts src/index.ts
-          git commit -m "Fix cookie configuration for cross-domain auth"
-          git pushme, ${user.name}!</h1>
+          <h1>Welcome, ${user.name}!</h1>
           <p>Click the link below to verify your email:</p>
           <a href="${url}">Verify Email</a>
         `,
