@@ -26,6 +26,18 @@ export async function getAllForms({ user }: Context) {
     where: { ownerId: user.id },
   });
 
+  // Get draft counts separately because Prisma _count where is limited
+  const draftCounts = await Promise.all(
+    forms.map(async (form) => {
+      return prisma.formResponse.count({
+        where: {
+          formId: form.id,
+          isSubmitted: false,
+        },
+      });
+    }),
+  );
+
   if (forms.length === 0) {
     logger.info("No forms found for user", { userId: user.id });
     return {
@@ -35,13 +47,14 @@ export async function getAllForms({ user }: Context) {
     };
   }
 
-  // Transform to include responseCount
-  const formsWithCount = forms.map((form) => ({
+  // Transform to include responseCount and draftCount
+  const formsWithCount = forms.map((form, index) => ({
     id: form.id,
     title: form.title,
     isPublished: form.isPublished,
     createdAt: form.createdAt,
     responseCount: form._count.formResponses,
+    draftCount: draftCounts[index],
   }));
 
   logger.info("Fetched all forms for user", {

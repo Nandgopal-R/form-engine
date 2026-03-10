@@ -1,6 +1,7 @@
 import { prisma } from "../../db/prisma";
 import { logger } from "../../logger/";
 import type {
+  Context,
   FormResponseContext,
   FormResponseForFormOwnerContext,
   GetSubmittedResponseContext,
@@ -328,5 +329,84 @@ export async function getAllUserResponses({ user }: { user: { id: string } }) {
     success: true,
     message: "Responses retrieved successfully",
     data: formattedResponses,
+  };
+}
+
+export async function getAllReceivedResponses({ user, set }: Context) {
+  // Find all forms owned by the user
+  const forms = await prisma.form.findMany({
+    where: { ownerId: user.id },
+    select: { id: true, title: true },
+  });
+
+  if (forms.length === 0) {
+    return {
+      success: true,
+      data: [],
+      message: "No forms found",
+    };
+  }
+
+  const formIds = forms.map((f) => f.id);
+
+  // Find all responses for those forms
+  const responses = await prisma.formResponse.findMany({
+    where: {
+      formId: { in: formIds },
+    },
+    include: {
+      form: {
+        select: { title: true },
+      },
+      respondent: {
+        select: { name: true, email: true },
+      },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+
+  // Get all fields for these forms to map IDs to names
+  const fields = await prisma.formFields.findMany({
+    where: { formId: { in: formIds } },
+    select: { id: true, fieldName: true, formId: true },
+  });
+
+  // Create a map of formId -> { fieldId -> fieldName }
+  const fieldMap: Record<string, Record<string, string>> = {};
+  fields.forEach((f) => {
+    if (!fieldMap[f.formId]) fieldMap[f.formId] = {};
+    fieldMap[f.formId][f.id] = f.fieldName;
+  });
+
+  // Transform responses for frontend consumption
+  const formattedResponses = responses.map((r) => {
+    const transformedAnswers: Record<string, any> = {};
+    const fieldIdToName = fieldMap[r.formId] || {};
+
+    for (const [fieldId, value] of Object.entries(
+      r.answers as Record<string, any>,
+    )) {
+      const fieldName = fieldIdToName[fieldId] ?? fieldId;
+      transformedAnswers[fieldName] = value;
+    }
+
+    return {
+      id: r.id,
+      formId: r.formId,
+      formName: r.form.title,
+      responder: r.respondent?.name || "Guest User",
+      email: r.respondent?.email || "N/A",
+      answers: transformedAnswers,
+      isSubmitted: r.isSubmitted,
+      submittedAt: r.submittedAt,
+      createdAt: r.updatedAt,
+      status: r.isSubmitted ? "Completed" : "Draft",
+    };
+  });
+
+  return {
+    success: true,
+    data: formattedResponses,
+    message: "All received responses fetched successfully",
   };
 }
