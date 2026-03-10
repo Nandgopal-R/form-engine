@@ -33,12 +33,12 @@ export const auth = betterAuth({
   },
 
   advanced: {
-    useSecureCookies: true, // Must be true for production (HTTPS)
+    useSecureCookies: process.env.NODE_ENV === "production",
     crossSubDomainCookies: {
       enabled: false, // Not subdomains, different domains entirely
     },
     defaultCookieAttributes: {
-      sameSite: "none", // CRITICAL: Allow cross-site cookies (Vercel <-> Railway)
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     },
   },
 

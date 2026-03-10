@@ -253,6 +253,97 @@ export async function getSubmittedResponse({
   };
 }
 
+// Get all responses received for forms owned by the current user
+export async function getAllReceivedResponses({
+  user,
+}: {
+  user: { id: string };
+}) {
+  const responses = await prisma.formResponse.findMany({
+    where: {
+      form: {
+        ownerId: user.id,
+      },
+    },
+    select: {
+      id: true,
+      formId: true,
+      answers: true,
+      isSubmitted: true,
+      submittedAt: true,
+      updatedAt: true,
+      respondent: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+      form: {
+        select: {
+          title: true,
+        },
+      },
+    },
+    orderBy: {
+      updatedAt: "desc",
+    },
+  });
+
+  if (responses.length === 0) {
+    logger.info(`No received responses found for user ${user.id}`);
+    return {
+      success: true,
+      message: "No responses found",
+      data: [],
+    };
+  }
+
+  // Collect all unique formIds to batch-fetch fields
+  const formIds = [...new Set(responses.map((r) => r.formId))];
+  const allFields = await prisma.formFields.findMany({
+    where: { formId: { in: formIds } },
+    select: { id: true, fieldName: true, formId: true },
+  });
+
+  const fieldMapByForm: Record<string, Record<string, string>> = {};
+  for (const f of allFields) {
+    if (!fieldMapByForm[f.formId]) fieldMapByForm[f.formId] = {};
+    fieldMapByForm[f.formId][f.id] = f.fieldName;
+  }
+
+  const formattedResponses = responses.map((r) => {
+    const fieldIdToNameMap = fieldMapByForm[r.formId] ?? {};
+    const transformedAnswers: Record<string, unknown> = {};
+    for (const [fieldId, value] of Object.entries(
+      r.answers as Record<string, unknown>,
+    )) {
+      const fieldName = fieldIdToNameMap[fieldId] ?? fieldId;
+      transformedAnswers[fieldName] = value;
+    }
+
+    return {
+      id: r.id,
+      formId: r.formId,
+      formName: r.form.title,
+      responder: r.respondent?.name ?? "Anonymous",
+      email: r.respondent?.email ?? "",
+      answers: transformedAnswers,
+      isSubmitted: r.isSubmitted,
+      status: r.isSubmitted ? "Completed" : "Draft",
+      createdAt: r.submittedAt ?? r.updatedAt,
+    };
+  });
+
+  logger.info(
+    `Retrieved ${formattedResponses.length} received responses for user ${user.id}`,
+  );
+  return {
+    success: true,
+    message: "Responses retrieved successfully",
+    data: formattedResponses,
+  };
+}
+
 // Get all responses submitted by the current user across all forms
 export async function getAllUserResponses({ user }: { user: { id: string } }) {
   const responses = await prisma.formResponse.findMany({
