@@ -7,7 +7,15 @@ import { formRoutes, publicFormRoutes } from "./api/forms/routes";
 import { logger } from "./logger/index";
 
 const app = new Elysia()
-  .use(cors())
+  .use(
+    cors({
+      origin:
+        process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",").map((o) =>
+          o.trim(),
+        ) || "*",
+      credentials: true,
+    }),
+  )
 
   .onError(({ code, error, set, request }) => {
     // A. Validation Errors (TypeBox)
