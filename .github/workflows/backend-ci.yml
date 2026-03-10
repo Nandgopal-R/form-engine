@@ -80,6 +80,9 @@ jobs:
     - name: Security audit
       run: bun audit
 
+    - name: Run integration tests
+      run: bun test src/integration_testing/
+
     - name: Build application
       run: bun run build
 
