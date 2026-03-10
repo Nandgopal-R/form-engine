@@ -14,6 +14,9 @@ const app = new Elysia()
           o.trim(),
         ) || "*",
       credentials: true,
+      allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+      exposedHeaders: ["Set-Cookie"],
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     }),
   )
 
