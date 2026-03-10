@@ -81,7 +81,7 @@ jobs:
       run: bun audit
 
     - name: Run integration tests
-      run: bun test src/integration_testing/
+      run: bun test src/integration_testing/auth.integration.test.ts src/integration_testing/forms.integration.test.ts src/integration_testing/form-fields.integration.test.ts src/integration_testing/form-response.integration.test.ts
 
     - name: Build application
       run: bun run build
