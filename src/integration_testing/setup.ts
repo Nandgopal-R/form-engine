@@ -81,7 +81,19 @@ export const originalFetch = globalThis.fetch;
 export const mockFetch = mock();
 
 export function enableFetchMock() {
-  globalThis.fetch = mockFetch as unknown as typeof fetch;
+  // Only intercept Groq API calls; pass all others through to the original fetch
+  globalThis.fetch = ((url: string | URL | Request, init?: RequestInit) => {
+    const urlStr =
+      typeof url === "string"
+        ? url
+        : url instanceof URL
+          ? url.toString()
+          : url.url;
+    if (urlStr.includes("groq.com")) {
+      return mockFetch(url, init);
+    }
+    return originalFetch(url, init);
+  }) as typeof fetch;
 }
 
 export function restoreFetch() {
