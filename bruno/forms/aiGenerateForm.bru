@@ -1,0 +1,44 @@
+meta {
+  name: aiGenerateForm
+  type: http
+  seq: 8
+}
+
+post {
+  url: http://localhost:8000/forms/ai-generate
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "prompt": "build a form for collecting faculty review with fields for faculty name, department, course taught, ratings for teaching quality, communication skills, and overall feedback"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 30000
+}
+
+docs {
+  # AI Generate Form
+  
+  Uses Google Gemini to generate a complete form from a text prompt.
+  
+  * **URL:** `/forms/ai-generate`
+  * **Method:** `POST`
+  * **Auth Required:** Yes
+  
+  ### Request Body
+  
+  | Field | Type | Required | Description |
+  | :--- | :--- | :--- | :--- |
+  | `prompt` | `string` | Yes | A natural language description of the form to generate. |
+  
+  ### Example Prompts
+  
+  - "build a form for collecting faculty review"
+  - "create a student registration form with personal and academic details"
+  - "make a feedback form for a workshop with ratings and comments"
+}
