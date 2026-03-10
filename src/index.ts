@@ -4,6 +4,7 @@ import { authRoutes } from "./api/auth/routes";
 import { formFieldRoutes } from "./api/form-fields/routes";
 import { formResponseRoutes } from "./api/form-response/routes";
 import { formRoutes, publicFormRoutes } from "./api/forms/routes";
+import { paymentRoutes } from "./api/payment/routes";
 import { logger } from "./logger/index";
 
 const app = new Elysia()
@@ -48,7 +49,8 @@ const app = new Elysia()
   .use(publicFormRoutes) // Public routes first (no auth)
   .use(formRoutes)
   .use(formFieldRoutes)
-  .use(formResponseRoutes);
+  .use(formResponseRoutes)
+  .use(paymentRoutes);
 
 app.listen(8000);
 
