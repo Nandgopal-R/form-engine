@@ -15,6 +15,14 @@ import {
   updateField,
 } from "./controller";
 
+// Public routes (no auth required for viewing form fields)
+export const publicFormFieldRoutes = new Elysia({ prefix: "/fields" }).get(
+  "/public/:formId",
+  getAllFields,
+  getAllFieldsDTO,
+);
+
+// Protected routes (require auth)
 export const formFieldRoutes = new Elysia({ prefix: "/fields" })
   .use(requireAuth)
   .get("/:formId", getAllFields, getAllFieldsDTO)
