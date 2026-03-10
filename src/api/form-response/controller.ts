@@ -368,14 +368,14 @@ export async function getAllReceivedResponses({ user, set }: Context) {
   // Get all fields for these forms to map IDs to names
   const fields = await prisma.formFields.findMany({
     where: { formId: { in: formIds } },
-    select: { id: true, fieldName: true, formId: true },
+    select: { id: true, fieldName: true, label: true, formId: true },
   });
 
-  // Create a map of formId -> { fieldId -> fieldName }
+  // Create a map of formId -> { fieldId -> displayName }
   const fieldMap: Record<string, Record<string, string>> = {};
   fields.forEach((f) => {
     if (!fieldMap[f.formId]) fieldMap[f.formId] = {};
-    fieldMap[f.formId][f.id] = f.fieldName;
+    fieldMap[f.formId][f.id] = f.label || f.fieldName || f.id;
   });
 
   // Transform responses for frontend consumption
@@ -384,7 +384,7 @@ export async function getAllReceivedResponses({ user, set }: Context) {
     const fieldIdToName = fieldMap[r.formId] || {};
 
     for (const [fieldId, value] of Object.entries(
-      r.answers as Record<string, any>,
+      (r.answers as Record<string, any>) || {},
     )) {
       const fieldName = fieldIdToName[fieldId] ?? fieldId;
       transformedAnswers[fieldName] = value;
