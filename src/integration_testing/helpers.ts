@@ -6,12 +6,10 @@ const { app } = await import("./app");
 
 export { app, resetAllMocks, setAuthenticatedUser };
 export {
-  enableFetchMock,
   jsonBody,
   mockFetch,
   OTHER_USER,
   prismaMock,
   request,
-  restoreFetch,
   TEST_USER,
 } from "./setup";

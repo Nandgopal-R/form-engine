@@ -74,31 +74,14 @@ mock.module("../api/auth/index", () => ({
 }));
 
 // ──────────────────────────────────────────────────────
-// MOCK: Groq AI API (fetch)
+// MOCK: Groq AI API (groq-fetch module)
 // ──────────────────────────────────────────────────────
 
-export const originalFetch = globalThis.fetch;
 export const mockFetch = mock();
 
-export function enableFetchMock() {
-  // Only intercept Groq API calls; pass all others through to the original fetch
-  globalThis.fetch = ((url: string | URL | Request, init?: RequestInit) => {
-    const urlStr =
-      typeof url === "string"
-        ? url
-        : url instanceof URL
-          ? url.toString()
-          : url.url;
-    if (urlStr.includes("groq.com")) {
-      return mockFetch(url, init);
-    }
-    return originalFetch(url, init);
-  }) as typeof fetch;
-}
-
-export function restoreFetch() {
-  globalThis.fetch = originalFetch;
-}
+mock.module("../api/form-analytics/groq-fetch", () => ({
+  groqFetch: mockFetch,
+}));
 
 // ──────────────────────────────────────────────────────
 // Helpers

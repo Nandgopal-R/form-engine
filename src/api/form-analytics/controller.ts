@@ -5,6 +5,7 @@ import type {
   AnalyticsReport,
   FormAnalyticsContext,
 } from "../../types/form-analytics";
+import { groqFetch } from "./groq-fetch";
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
@@ -44,7 +45,7 @@ RULES:
 async function callGroqForAnalytics(
   responsesJson: string,
 ): Promise<AnalyticsReport> {
-  const response = await fetch(GROQ_API_URL, {
+  const response = await groqFetch(GROQ_API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

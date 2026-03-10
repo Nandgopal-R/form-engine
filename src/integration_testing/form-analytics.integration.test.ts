@@ -1,13 +1,11 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import { beforeEach, describe, expect, it } from "bun:test";
 import {
   app,
-  enableFetchMock,
   mockFetch,
   OTHER_USER,
   prismaMock,
   request,
   resetAllMocks,
-  restoreFetch,
   setAuthenticatedUser,
   TEST_USER,
 } from "./helpers";
@@ -50,11 +48,6 @@ describe("Form Analytics Integration Tests", () => {
   beforeEach(() => {
     resetAllMocks();
     setAuthenticatedUser(TEST_USER);
-    enableFetchMock();
-  });
-
-  afterEach(() => {
-    restoreFetch();
   });
 
   // ─────────────────────────────────────────────
