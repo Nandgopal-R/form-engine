@@ -47,21 +47,25 @@ export const auth = betterAuth({
   },
 
   emailVerification: {
-    sendOnSignUp: true,
+    sendOnSignUp: false, // Disabled until SMTP is properly configured
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
-      await transporter.sendMail({
-        from: `"My App" <${process.env.FROM_EMAIL}>`,
+      try {
+        await transporter.sendMail({
+          from: `"My App" <${process.env.FROM_EMAIL}>`,
 
-        to: user.email,
-        subject: "Verify your email address",
-        html: `
-          <h1>Welcome, ${user.name}!</h1>
-          <p>Click the link below to verify your email:</p>
-          <a href="${url}">Verify Email</a>
-        `,
-      });
-      console.log(`Verification email sent to ${user.email}`);
+          to: user.email,
+          subject: "Verify your email address",
+          html: `
+            <h1>Welcome, ${user.name}!</h1>
+            <p>Click the link below to verify your email:</p>
+            <a href="${url}">Verify Email</a>
+          `,
+        });
+        console.log(`Verification email sent to ${user.email}`);
+      } catch (error) {
+        console.error("Failed to send verification email:", error);
+      }
     },
   },
 
