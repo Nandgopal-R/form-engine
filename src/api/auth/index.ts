@@ -37,7 +37,9 @@ export const auth = betterAuth({
     crossSubDomainCookies: {
       enabled: false, // Not subdomains, different domains entirely
     },
-    cookieSameSite: "none", // CRITICAL: Allow cross-site cookies
+    defaultCookieAttributes: {
+      sameSite: "none", // CRITICAL: Allow cross-site cookies (Vercel <-> Railway)
+    },
   },
 
   emailAndPassword: {

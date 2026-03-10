@@ -1,7 +1,10 @@
 import { cors } from "@elysiajs/cors";
 import { Elysia } from "elysia";
 import { authRoutes } from "./api/auth/routes";
-import { formFieldRoutes } from "./api/form-fields/routes";
+import {
+  formFieldRoutes,
+  publicFormFieldRoutes,
+} from "./api/form-fields/routes";
 import { formResponseRoutes } from "./api/form-response/routes";
 import { formRoutes, publicFormRoutes } from "./api/forms/routes";
 import { logger } from "./logger/index";
@@ -57,6 +60,7 @@ const app = new Elysia()
   .get("/", () => "🦊 Elysia server started")
   .use(authRoutes)
   .use(publicFormRoutes) // Public routes first (no auth)
+  .use(publicFormFieldRoutes) // Public form fields (no auth)
   .use(formRoutes)
   .use(formFieldRoutes)
   .use(formResponseRoutes);
