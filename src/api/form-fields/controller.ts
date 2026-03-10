@@ -37,17 +37,35 @@ export async function getAllFields({ params, set }: GetAllFieldsContext) {
   }
 
   const ordered: typeof fields = [];
+  const visited = new Set<string>();
 
+  // Try to reconstruct the ordered list by following prevFieldId pointers
   let current = fields.find(
     (f): f is (typeof fields)[number] => f.prevFieldId === null,
   );
 
-  while (current) {
+  while (current && !visited.has(current.id)) {
     ordered.push(current);
+    visited.add(current.id);
 
     current = fields.find(
       (f): f is (typeof fields)[number] => f.prevFieldId === current!.id,
     );
+  }
+
+  // Fallback: If some fields were missed (e.g. corrupted pointers or multiple heads
+  // due to race conditions during creation), append them at the end.
+  // This ensures all fields show up in the UI even if the order is temporarily wrong.
+  if (ordered.length < fields.length) {
+    logger.warn(
+      `Field order for form ${params.formId} is corrupted. Appending ${fields.length - ordered.length} missing fields.`,
+    );
+    fields.forEach((f) => {
+      if (!visited.has(f.id)) {
+        ordered.push(f);
+        visited.add(f.id);
+      }
+    });
   }
 
   return { success: true, data: ordered };
@@ -73,15 +91,19 @@ export async function createField({
 
   const createdField = await prisma.$transaction(async (tx) => {
     /**
-     * INSERT AT HEAD
+     * INSERT AT TAIL (when no prevFieldId is given)
      */
     if (!body.prevFieldId) {
-      const currentHead = await tx.formFields.findFirst({
-        where: {
-          formId: params.formId,
-          prevFieldId: null,
-        },
+      // Find all fields for this form
+      const allFields = await tx.formFields.findMany({
+        where: { formId: params.formId },
       });
+
+      // Find the tail: the field that no other field points to as its prev
+      const idsPointedTo = new Set(
+        allFields.map((f) => f.prevFieldId).filter(Boolean),
+      );
+      const tail = allFields.find((f) => !idsPointedTo.has(f.id));
 
       const created = await tx.formFields.create({
         data: {
@@ -92,16 +114,9 @@ export async function createField({
           validation: body.validation ?? undefined,
           options: body.options ?? undefined,
           formId: params.formId,
-          prevFieldId: null,
+          prevFieldId: tail ? tail.id : null,
         },
       });
-
-      if (currentHead) {
-        await tx.formFields.update({
-          where: { id: currentHead.id },
-          data: { prevFieldId: created.id },
-        });
-      }
 
       return created;
     }

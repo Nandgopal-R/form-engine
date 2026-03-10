@@ -109,6 +109,7 @@ describe("Form Fields Controller", () => {
     transactionMock.mockImplementation(async (cb: any) => {
       return cb({
         formFields: {
+          findMany: async () => [],
           findFirst: async () => null,
           create: async () => ({ id: "new" }),
           update: async () => {},
