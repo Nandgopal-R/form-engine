@@ -2,6 +2,7 @@ import { cors } from "@elysiajs/cors";
 import { Elysia } from "elysia";
 import { auth } from "./api/auth/index";
 import { authRoutes } from "./api/auth/routes";
+import { formAnalyticsRoutes } from "./api/form-analytics/routes";
 import {
   formFieldRoutes,
   publicFormFieldRoutes,
@@ -73,7 +74,8 @@ const app = new Elysia()
   .use(publicFormFieldRoutes) // Public form fields (no auth)
   .use(formRoutes)
   .use(formFieldRoutes)
-  .use(formResponseRoutes);
+  .use(formResponseRoutes)
+  .use(formAnalyticsRoutes);
 
 const port = Number(process.env.PORT) || 8000;
 app.listen({
