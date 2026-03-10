@@ -68,6 +68,47 @@ const app = new Elysia()
     }
     return "🦊 Elysia server started";
   })
+  // OAuth callback handler - intercept to handle custom state redirect
+  .get("/api/auth/callback/google", async ({ request, set, query }) => {
+    const state = query.state;
+
+    // Decode our custom state to get callback URL
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    let callbackURL = `${frontendUrl}/dashboard`;
+    if (state) {
+      try {
+        const decoded = JSON.parse(
+          Buffer.from(state as string, "base64url").toString(),
+        );
+        if (decoded.callbackURL) {
+          callbackURL = decoded.callbackURL;
+        }
+      } catch (e) {
+        console.error("Failed to decode state:", e);
+      }
+    }
+
+    // Let better-auth handle the OAuth callback
+    const response = await auth.handler(request);
+
+    // After successful auth, redirect to frontend with session cookie
+    if (response.ok || response.status === 302 || response.status === 301) {
+      // Copy all Set-Cookie headers from better-auth response
+      const headers = new Headers();
+      response.headers.forEach((value, key) => {
+        headers.append(key, value);
+      });
+      headers.set("Location", callbackURL);
+
+      return new Response(null, {
+        status: 302,
+        headers,
+      });
+    }
+
+    // If error, return the response as-is
+    return response;
+  })
   .use(authRoutes)
   .use(publicFormRoutes) // Public routes first (no auth)
   .use(publicFormFieldRoutes) // Public form fields (no auth)
