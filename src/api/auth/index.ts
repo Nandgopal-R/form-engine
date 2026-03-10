@@ -28,6 +28,13 @@ export const auth = betterAuth({
     modelName: "session",
   },
 
+  advanced: {
+    useSecureCookies: true, // Must be true for production (HTTPS)
+    crossSubDomainCookies: {
+      enabled: false, // Not subdomains, different domains entirely
+    },
+  },
+
   emailAndPassword: {
     enabled: true,
   },
