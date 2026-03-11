@@ -18,3 +18,11 @@ export const requireAuth = (app: Elysia) =>
       user: session.user as User,
     };
   });
+
+export const optionalAuth = (app: Elysia) =>
+  app.derive(async (context) => {
+    const session = await auth.api.getSession(context.request);
+    return {
+      user: (session?.user as User) ?? null,
+    };
+  });

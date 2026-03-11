@@ -28,15 +28,29 @@ describe("Form Response Integration Tests", () => {
       isSubmitted: true,
     };
 
-    it("returns 401 without authentication", async () => {
+    it("allows submission without authentication", async () => {
       setAuthenticatedUser(null);
+      prismaMock.form.findUnique.mockResolvedValue({
+        id: UUID,
+        isPublished: true,
+      });
+      prismaMock.formResponse.create.mockResolvedValue({
+        id: RESPONSE_ID,
+        formId: UUID,
+        respondentId: null,
+        answers: answerPayload.answers,
+        isSubmitted: true,
+      });
+
       const res = await app.handle(
         request(`/responses/submit/${UUID}`, {
           method: "POST",
           body: jsonBody(answerPayload),
         }),
       );
-      expect(res.status).toBe(401);
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data.success).toBe(true);
     });
 
     it("submits a response successfully", async () => {
