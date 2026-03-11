@@ -5,6 +5,11 @@ export interface Context {
   set: { status?: number | string };
 }
 
+export interface OptionalAuthContext {
+  user: { id: string } | null;
+  set: { status?: number | string };
+}
+
 export const formResponseDTO = {
   params: t.Object({
     formId: t.String({
@@ -27,7 +32,7 @@ export const formResponseDTO = {
   }),
 };
 
-export interface FormResponseContext extends Context {
+export interface FormResponseContext extends OptionalAuthContext {
   params: Static<typeof formResponseDTO.params>;
   body: Static<typeof formResponseDTO.body>;
 }

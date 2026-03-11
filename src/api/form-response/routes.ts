@@ -5,7 +5,7 @@ import {
   getSubmittedResponseDTO,
   resumeResponseDTO,
 } from "../../types/form-response";
-import { requireAuth } from "../auth/requireAuth";
+import { optionalAuth, requireAuth } from "../auth/requireAuth";
 import {
   getAllReceivedResponses,
   getAllUserResponses,
@@ -15,12 +15,19 @@ import {
   submitResponse,
 } from "./controller";
 
-export const formResponseRoutes = new Elysia({ prefix: "/responses" })
-  .use(requireAuth)
+const publicResponseRoutes = new Elysia()
+  .use(optionalAuth)
   .post("/submit/:formId", submitResponse, formResponseDTO)
-  .post("/draft/:formId", submitResponse, formResponseDTO)
+  .post("/draft/:formId", submitResponse, formResponseDTO);
+
+const protectedResponseRoutes = new Elysia()
+  .use(requireAuth)
   .put("/resume/:responseId", resumeResponse, resumeResponseDTO)
   .get("/my", getAllUserResponses)
   .get("/received", getAllReceivedResponses)
   .get("/:formId", getResponseForFormOwner, formResponseForFormOwnerDTO)
   .get("/user/:formId", getSubmittedResponse, getSubmittedResponseDTO);
+
+export const formResponseRoutes = new Elysia({ prefix: "/responses" })
+  .use(publicResponseRoutes)
+  .use(protectedResponseRoutes);

@@ -40,13 +40,13 @@ export async function submitResponse({
   const response = await prisma.formResponse.create({
     data: {
       formId: params.formId,
-      respondentId: user.id,
+      respondentId: user?.id ?? null,
       answers: body.answers,
       isSubmitted: body.isSubmitted ?? false,
     },
   });
   logger.info(
-    `User ${user.id} ${body.isSubmitted ? "submitted" : "saved draft"} response ${response.id} for form ${params.formId}`,
+    `User ${user?.id ?? "anonymous"} ${body.isSubmitted ? "submitted" : "saved draft"} response ${response.id} for form ${params.formId}`,
   );
   return {
     success: true,
