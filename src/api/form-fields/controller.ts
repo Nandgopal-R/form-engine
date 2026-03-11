@@ -115,14 +115,17 @@ export async function createField({
 
   const createdField = await prisma.$transaction(async (tx) => {
     /**
-     * INSERT AT HEAD
+     * INSERT AT TAIL
      */
     if (!body.prevFieldId) {
-      const currentHead = await tx.formFields.findFirst({
+      const lastField = await tx.formFields.findFirst({
         where: {
           formId: params.formId,
-          prevFieldId: null,
         },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1,
       });
 
       const created = await tx.formFields.create({
@@ -134,16 +137,9 @@ export async function createField({
           validation: body.validation ?? undefined,
           options: body.options ?? undefined,
           formId: params.formId,
-          prevFieldId: null,
+          prevFieldId: lastField?.id ?? null,
         },
       });
-
-      if (currentHead) {
-        await tx.formFields.update({
-          where: { id: currentHead.id },
-          data: { prevFieldId: created.id },
-        });
-      }
 
       return created;
     }
